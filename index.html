@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoE Backend Performance: CUTLASS vs TRT-LLM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #76b900, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #888;
+        }
+        
+        .hero-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 968px) {
+            .hero-results {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .result-card {
+            background: rgba(255,255,255,0.08);
+            padding: 30px;
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-card.winner {
+            border-color: #76b900;
+            background: linear-gradient(135deg, rgba(118,185,0,0.1), rgba(0,212,255,0.05));
+        }
+        
+        .result-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .winner-badge {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #76b900, #00d4ff);
+            color: #000;
+            font-weight: 700;
+        }
+        
+        .result-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .result-metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: #aaa;
+        }
+        
+        .metric-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .metric-value.highlight {
+            color: #76b900;
+            font-size: 1.3rem;
+        }
+        
+        .section {
+            background: rgba(255,255,255,0.05);
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #76b900;
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3.low-latency {
+            color: #00d4ff;
+        }
+        
+        h3.high-throughput {
+            color: #76b900;
+        }
+        
+        .code-section {
+            margin: 20px 0;
+        }
+        
+        .code-header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(118,185,0,0.3);
+            border-bottom: none;
+            transition: all 0.3s ease;
+        }
+        
+        .code-header:hover {
+            background: linear-gradient(135deg, #2a2a3e, #26314e);
+        }
+        
+        .code-header.high-throughput {
+            border-color: rgba(118,185,0,0.5);
+        }
+        
+        .code-header.low-latency {
+            border-color: rgba(0,212,255,0.5);
+        }
+        
+        .code-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        
+        .expand-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+        
+        .code-header.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+        
+        .code-block {
+            background: #0a0a0a;
+            padding: 0;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+            border: 1px solid rgba(118,185,0,0.3);
+            border-top: none;
+            max-height: 0;
+            transition: max-height 0.3s ease;
+        }
+        
+        .code-block.low-latency {
+            border-color: rgba(0,212,255,0.3);
+        }
+        
+        .code-block.expanded {
+            max-height: 2000px;
+            padding: 20px;
+        }
+        
+        .code-block code {
+            color: #76b900;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre;
+            display: block;
+            overflow-x: auto;
+        }
+        
+        .copy-button {
+            background: #76b900;
+            color: #000;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+        }
+        
+        .copy-button:hover {
+            background: #00d4ff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85rem;
+        }
+        
+        th {
+            background: rgba(118,185,0,0.2);
+            color: #76b900;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        tr.nvidia-reference {
+            background: rgba(118,185,0,0.1);
+        }
+        
+        tr.winner {
+            background: rgba(118,185,0,0.25);
+        }
+        
+        tr.loser {
+            background: rgba(255,68,68,0.1);
+        }
+        
+        .perf-value {
+            font-weight: 700;
+        }
+        
+        .perf-good {
+            color: #76b900;
+        }
+        
+        .perf-bad {
+            color: #ff4444;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        .config-note {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .section { padding: 20px; }
+            table { font-size: 0.75rem; }
+            th, td { padding: 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MoE Backend Performance Analysis</h1>
+            <p class="subtitle">Deep Dive: CUTLASS vs TensorRT-LLM on GPT-OSS-120B</p>
+        </header>
+
+        <!-- Hero Results Section -->
+        <div class="hero-results">
+            <div class="result-card winner">
+                <h3>
+                    🚀 High Throughput Champion
+                    <span class="winner-badge">CUTLASS</span>
+                </h3>
+                <div class="result-metric">
+                    <span class="metric-label">Throughput/GPU</span>
+                    <span class="metric-value highlight">20,859 tok/s</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">vs NVIDIA Reference</span>
+                    <span class="metric-value highlight">107%</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">vs TRT-LLM Backend</span>
+                    <span class="metric-value">+15% faster</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">Configuration</span>
+                    <span class="metric-value">4 GPUs, Batch 640</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">Best For</span>
+                    <span class="metric-value">Batch inference</span>
+                </div>
+            </div>
+
+            <div class="result-card winner">
+                <h3>
+                    ⚡ Low Latency Champion
+                    <span class="winner-badge">TRT-LLM</span>
+                </h3>
+                <div class="result-metric">
+                    <span class="metric-label">Throughput/GPU</span>
+                    <span class="metric-value highlight">462.38 tok/s</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">vs NVIDIA Reference</span>
+                    <span class="metric-value highlight">110%</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">vs CUTLASS Backend</span>
+                    <span class="metric-value">+59% faster</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">Configuration</span>
+                    <span class="metric-value">8 GPUs, Batch 1</span>
+                </div>
+                <div class="result-metric">
+                    <span class="metric-label">Best For</span>
+                    <span class="metric-value">Real-time chat</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Step 4: Reproduce NVIDIA's Benchmark Results</h2>
+            
+            <!-- Low Latency Section -->
+            <h3 class="low-latency">⚡ Low-Latency Use Case Results</h3>
+            <p class="config-note">Configuration: Max Batch Size = 1 | Dataset: gpt-oss-120b-1k2k.txt | Quantization: W4A8_MXFP4_MXFP8</p>
+            
+            <div class="code-section">
+                <div class="code-header low-latency" onclick="toggleCode('low-latency-cmd')">
+                    <div class="code-title">
+                        <span class="expand-icon">▶</span>
+                        <span>Click to view Low Latency benchmark command</span>
+                    </div>
+                    <button class="copy-button" onclick="event.stopPropagation(); copyCode('low-latency-cmd')">Copy</button>
+                </div>
+                <div class="code-block low-latency" id="low-latency-cmd">
+<code>num_gpus=8
+max_batch_size=1
+
+cat <<EOF > low_latency.yaml
+enable_attention_dp: false
+cuda_graph_config:
+    max_batch_size: ${max_batch_size}
+    enable_padding: true
+moe_config:
+    backend: TRTLLM
+EOF
+
+trtllm-bench \
+    --model openai/gpt-oss-120b \
+    throughput \
+    --backend pytorch \
+    --tp ${num_gpus} \
+    --ep 1 \
+    --extra_llm_api_options low_latency.yaml \
+    --dataset gpt-oss-120b-1k2k.txt \
+    --max_batch_size ${max_batch_size} \
+    --concurrency ${max_batch_size} \
+    --num_requests $((max_batch_size * 10)) \
+    --kv_cache_free_gpu_mem_fraction 0.9 \
+    --streaming \
+    --warmup 0 \
+    --report_json low_latency_benchmark.json</code>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>GPUs</th>
+                            <th>TP</th>
+                            <th>EP</th>
+                            <th>Backend</th>
+                            <th>MoE Backend</th>
+                            <th>Batch</th>
+                            <th>Throughput/GPU (tok/s)</th>
+                            <th>Total Latency (ms)</th>
+                            <th>TTFT (ms)</th>
+                            <th>vs NVIDIA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="nvidia-reference">
+                            <td><strong>8</strong></td>
+                            <td><strong>8</strong></td>
+                            <td>1</td>
+                            <td>TRT-LLM</td>
+                            <td>-</td>
+                            <td>1</td>
+                            <td class="perf-value">420</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><strong>Reference</strong></td>
+                        </tr>
+                        <tr class="winner">
+                            <td><strong>8</strong></td>
+                            <td><strong>8</strong></td>
+                            <td>1</td>
+                            <td>PyTorch</td>
+                            <td class="perf-good">TRT-LLM</td>
+                            <td>1</td>
+                            <td class="perf-value perf-good">462.38</td>
+                            <td>4351.85</td>
+                            <td>75.56</td>
+                            <td class="perf-good"><strong>110%</strong></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>8</td>
+                            <td>1</td>
+                            <td>PyTorch</td>
+                            <td>CUTLASS</td>
+                            <td>1</td>
+                            <td class="perf-value">290.73</td>
+                            <td>7047.19</td>
+                            <td>78.27</td>
+                            <td>69%</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>4</td>
+                            <td>1</td>
+                            <td>PyTorch</td>
+                            <td>TRT-LLM</td>
+                            <td>1</td>
+                            <td class="perf-value">453.29</td>
+                            <td>4522.50</td>
+                            <td>74.19</td>
+                            <td>108%</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>2</td>
+                            <td>1</td>
+                            <td>PyTorch</td>
+                            <td>TRT-LLM</td>
+                            <td>1</td>
+                            <td class="perf-value">407.91</td>
+                            <td>5022.43</td>
+                            <td>53.29</td>
+                            <td>97%</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>PyTorch</td>
+                            <td>TRT-LLM</td>
+                            <td>1</td>
+                            <td class="perf-value">351.81</td>
+                            <td>5822.18</td>
+                            <td>49.47</td>
+                            <td>84%</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>8</td>
+                            <td>1</td>
+                            <td>PyTorch</td>
+                            <td>TRT-LLM</td>
+                            <td>640</td>
+                            <td class="perf-value">69.40</td>
+                            <td>29657.47</td>
+                            <td>1034.67</td>
+                            <td>17%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- High Throughput Section -->
+            <h3 class="high-throughput">🚀 High-Throughput Use Case Results</h3>
+            <p class="config-note">Configuration: Concurrency = Batch × GPUs | Requests = 3 × Concurrency | KV Cache: 90%</p>
+            
+            <div class="code-section">
+                <div class="code-header high-throughput" onclick="toggleCode('high-throughput-cmd')">
+                    <div class="code-title">
+                        <span class="expand-icon">▶</span>
+                        <span>Click to view High Throughput benchmark command</span>
+                    </div>
+                    <button class="copy-button" onclick="event.stopPropagation(); copyCode('high-throughput-cmd')">Copy</button>
+                </div>
+                <div class="code-block high-throughput" id="high-throughput-cmd">
+<code>num_gpus=4
+max_batch_size=640
+
+cat <<EOF > max_throughput.yaml
+enable_attention_dp: true
+cuda_graph_config:
+    max_batch_size: ${max_batch_size}
+    enable_padding: true
+stream_interval: 10
+moe_config:
+    backend: CUTLASS
+EOF
+
+trtllm-bench \
+    --model openai/gpt-oss-120b \
+    throughput \
+    --backend pytorch \
+    --tp ${num_gpus} \
+    --ep ${num_gpus} \
+    --extra_llm_api_options max_throughput.yaml \
+    --dataset gpt-oss-120b-1k2k.txt \
+    --max_batch_size ${max_batch_size} \
+    --concurrency $((max_batch_size * num_gpus)) \
+    --num_requests $((max_batch_size * num_gpus * 3)) \
+    --kv_cache_free_gpu_mem_fraction 0.9 \
+    --streaming \
+    --warmup 0 \
+    --report_json max_throughput_benchmark.json</code>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>GPUs</th>
+                            <th>TP</th>
+                            <th>EP</th>
+                            <th>MoE Backend</th>
+                            <th>Batch Size</th>
+                            <th>Request Rate (req/s)</th>
+                            <th>Throughput/GPU (tok/s)</th>
+                            <th>Total Latency (ms)</th>
+                            <th>TTFT (ms)</th>
+                            <th>vs NVIDIA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="nvidia-reference">
+                            <td><strong>4</strong></td>
+                            <td><strong>4</strong></td>
+                            <td><strong>4</strong></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td class="perf-value">19,500</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><strong>Reference</strong></td>
+                        </tr>
+                        <tr class="winner">
+                            <td><strong>4</strong></td>
+                            <td><strong>4</strong></td>
+                            <td><strong>4</strong></td>
+                            <td class="perf-good">CUTLASS</td>
+                            <td>640</td>
+                            <td>40.74</td>
+                            <td class="perf-value perf-good">20,859</td>
+                            <td>162,548</td>
+                            <td>3,287</td>
+                            <td class="perf-good"><strong>107%</strong></td>
+                        </tr>
+                        <tr class="loser">
+                            <td>4</td>
+                            <td>4</td>
+                            <td>4</td>
+                            <td class="perf-bad">TRT-LLM</td>
+                            <td>640</td>
+                            <td>35.27</td>
+                            <td class="perf-value perf-bad">18,051</td>
+                            <td>272,348</td>
+                            <td>4,321</td>
+                            <td class="perf-bad">93% (-13%)</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>8</td>
+                            <td>8</td>
+                            <td>CUTLASS</td>
+                            <td>640</td>
+                            <td>75.61</td>
+                            <td class="perf-value">19,355</td>
+                            <td>203,157</td>
+                            <td>5,880</td>
+                            <td>99%</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>2</td>
+                            <td>2</td>
+                            <td>CUTLASS</td>
+                            <td>640</td>
+                            <td>18.14</td>
+                            <td class="perf-value">18,550</td>
+                            <td>262,587</td>
+                            <td>6,048</td>
+                            <td>95%</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>CUTLASS</td>
+                            <td>640</td>
+                            <td>7.71</td>
+                            <td class="perf-value">15,795</td>
+                            <td>373,377</td>
+                            <td>16,897</td>
+                            <td>81%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCode(id) {
+            const codeBlock = document.getElementById(id);
+            const header = codeBlock.previousElementSibling;
+            
+            codeBlock.classList.toggle('expanded');
+            header.classList.toggle('expanded');
+        }
+        
+        function copyCode(id) {
+            const codeBlock = document.getElementById(id);
+            const code = codeBlock.querySelector('code').textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
