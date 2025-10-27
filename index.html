@@ -808,14 +808,22 @@
         <!-- Command Section -->
         <div class="command-section">
             <div class="section-header" onclick="toggleSection(this)">
-                <div class="toggle-icon">▶</div>
-                <h2>⚙️ Run High Throughput Benchmark Command</h2>
-            </div>
-            
-            <div class="section-content">
-                <div class="code-block">
-                    <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
-                    <code>#!/bin/bash
+                    <div class="toggle-icon">▶</div>
+                    <h2>⚙️ Run High Throughput Benchmark Command</h2>
+                </div>
+                <div class="section-content">
+                    <!-- Enable Perfect Router Command -->
+                    <div class="command-section" style="margin-top: 0; margin-bottom: 32px;">
+                        <h2 style="color: #60a5fa;">Enable Perfect Router</h2>
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
+                            <code>export ENABLE_PERFECT_ROUTER=1</code>
+                        </div>
+                        <p style="color: #8E8E93; margin-top: 10px;">Set this environment variable before running your MoE backend to enable perfect routing for benchmarking.</p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
+                        <code>#!/bin/bash
 
 num_gpus=4
 max_batch_size=640
@@ -845,8 +853,8 @@ trtllm-bench \
     --streaming \
     --warmup 0 \
     --report_json max_throughput_benchmark.json</code>
+                    </div>
                 </div>
-            </div>
         </div>
 
         <!-- MoE Architecture Diagram Section -->
@@ -1505,11 +1513,17 @@ trtllm-bench \
         
         // Toggle Section Expand/Collapse
         function toggleSection(header) {
-            const content = header.nextElementSibling;
+            // Find the closest .command-section parent
+            const section = header.closest('.command-section');
+            // Find the first .section-content inside this section
+            const content = section.querySelector('.section-content');
             const toggleIcon = header.querySelector('.toggle-icon');
-            
-            content.classList.toggle('collapsed');
-            toggleIcon.classList.toggle('collapsed');
+            if (content) {
+                content.classList.toggle('collapsed');
+            }
+            if (toggleIcon) {
+                toggleIcon.classList.toggle('collapsed');
+            }
         }
 
         // Chart configuration with custom tooltips
