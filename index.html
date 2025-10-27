@@ -764,7 +764,7 @@
                         <td class="gpu-h100">Gen4: 900 GB/s</td>
                         <td class="gpu-a100">Gen3: 600 GB/s</td>
                     </tr>
-                    <tr class="comm-highlight">
+                    <!-- <tr class="comm-highlight">
                         <td class="metric-dimension">🔗 NVSwitch/Cabinet Domain</td>
                         <td class="gpu-b200"><span class="highlight-value">NVL72: 72 GPUs</span><br>130 TB/s total<br>1.8 TB/s cross-cabinet</td>
                         <td class="gpu-h100">256 H100 cross-node<br>57.6 TB/s full mesh</td>
@@ -775,7 +775,7 @@
                         <td class="gpu-b200">✓ Supported<br>(2x effective throughput)</td>
                         <td class="gpu-h100">✓ Supported</td>
                         <td class="gpu-a100">✓ First introduced</td>
-                    </tr>
+                    </tr> -->
                     <tr>
                         <td class="metric-dimension">Hardware Decompression</td>
                         <td class="gpu-b200"><span class="highlight-value">✓ DE Engine</span><br>~600 GB/s decompress<br>Snappy/LZ4/Deflate</td>
@@ -851,7 +851,7 @@ trtllm-bench \
 
         <!-- MoE Architecture Diagram Section -->
         <div class="architecture-section" style="margin: 40px auto; max-width: 1200px; padding: 30px; background: rgba(10,10,10,0.8); border: 1px solid #1C1C1E; border-radius: 16px; backdrop-filter: blur(10px);">
-            <h2 style="text-align: center; color: #60a5fa; margin-bottom: 30px; font-size: 2rem;">MoE Architecture Comparison</h2>
+            <h2 style="text-align: center; color: #60a5fa; margin-bottom: 30px; font-size: 2rem;">MoE Architecture</h2>
             <div class="architecture-diagram" style="display: flex; flex-direction: column; align-items: center;">
                 <img src="./images/moe_communication.png" alt="Transformer block vs Transformer block with MoE" style="max-width: 1000px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 6px 30px rgba(0,0,0,0.5); margin: 0 auto; display: block; background: #ffffff; padding: 15px;">
                 <p style="text-align: center; color: #8E8E93; margin-top: 20px; font-style: italic; font-size: 0.95rem; max-width: 900px;">
@@ -1191,7 +1191,6 @@ trtllm-bench \
                                 <th>Ideal Throughput(tokens/s/gpu)</th>
                                 <th>Actual Throughput(tokens/s/gpu)</th>
                                 <th>Throughput Gap</th>
-
                             </tr>
                         </thead>
                         <tbody>
@@ -1341,13 +1340,98 @@ trtllm-bench \
                             </tr>
                         </tbody>
                     </table>
+                    <!-- Expert Parallelism Charts -->
+                    <div style="margin-top: 60px; margin-bottom: 60px;">
+                        <h2 style="text-align: center; font-size: 2rem; margin-bottom: 40px; background: linear-gradient(135deg, #5E5CE6 0%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Expert Parallelism Analysis</h2>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+                            <!-- Throughput Chart -->
+                            <div style="background: rgba(28, 28, 30, 0.8); border: 1px solid #2C2C2E; border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
+                                <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa;">Throughput Impact (tok/s)</h3>
+                                <div style="position: relative; height: 350px;">
+                                    <canvas id="ep-throughput-chart"></canvas>
+                                </div>
+                                <p style="font-size: 0.9rem; color: #8E8E93; margin-top: 15px; padding-top: 15px; border-top: 1px solid #2C2C2E;">
+                                    Comparison of output throughput per GPU across CUTLASS and TRT-LLM backends with Open and Closed Expert Parallelism configurations.
+                                </p>
+                            </div>
+                            
+                            <!-- Latency Chart -->
+                            <div style="background: rgba(28, 28, 30, 0.8); border: 1px solid #2C2C2E; border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
+                                <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa;">Latency Impact (ms)</h3>
+                                <div style="position: relative; height: 350px;">
+                                    <canvas id="ep-latency-chart"></canvas>
+                                </div>
+                                <p style="font-size: 0.9rem; color: #8E8E93; margin-top: 15px; padding-top: 15px; border-top: 1px solid #2C2C2E;">
+                                    Total latency comparison across different GPU configurations and Expert Parallelism sizes. Lower values indicate better performance.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Benchmark Results Table -->
+                     <div style="margin-top: 40px;">
+                        <h3>Expert Parallelism: Throughput Impact Across MoE Backends</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>MoE Backend</th>
+                                    <th>GPUs</th>
+                                    <th>EP Size</th>
+                                    <th>Output Throughput/GPU (tok/s)</th>
+                                    <th>Throughput Gap (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>8</strong></td><td><strong>8</strong></td><td><strong>19355.29</strong></td><td class="perf-good"><strong>+30.5%</strong></td></tr>
+                                <tr><td>CUTLASS (Closed EP)</td><td>8</td><td>1</td><td>14834.88</td><td class="perf-good">0%</td></tr>
+                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><strong>20859.29</strong></td><td class="perf-neutral"><strong>+11.1%</strong></td></tr>
+                                <tr><td>CUTLASS (Closed EP)</td><td>4</td><td>1</td><td>18785.89</td><td class="perf-neutral">0%</td></tr>
+                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>2</strong></td><td><strong>2</strong></td><td><strong>18549.97</strong></td><td class="perf-neutral"><strong>+7.5%</strong></td></tr>
+                                <tr><td>CUTLASS (Closed EP)</td><td>2</td><td>1</td><td>17249.07</td><td class="perf-neutral">0%</td></tr>
+                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>8</strong></td><td><strong>8</strong></td><td><strong>14677.82</strong></td><td class="perf-bad"><strong>-13.4%</strong></td></tr>
+                                <tr><td>TRTLLM (Closed EP)</td><td>8</td><td>1</td><td>16954.52</td><td class="perf-bad">0%</td></tr>
+                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><strong>18051.06</strong></td><td class="perf-bad"><strong>-12.3%</strong></td></tr>
+                                <tr><td>TRTLLM (Closed EP)</td><td>4</td><td>1</td><td>20584.83</td><td class="perf-bad">0%</td></tr>
+                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>2</strong></td><td><strong>2</strong></td><td><strong>17160.87</strong></td><td class="perf-bad"><strong>-4.5%</strong></td></tr>
+                                <tr><td>TRTLLM (Closed EP)</td><td>2</td><td>1</td><td>17969.66</td><td class="perf-bad">0%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 40px;">
+                        <h3>Expert Parallelism: Latency Impact Across MoE Backends</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>MoE Backend</th>
+                                    <th>GPUs</th>
+                                    <th>EP Size</th>
+                                    <th>Total Latency (ms)</th>
+                                    <th>Latency Gap (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>8</strong></td><td><strong>8</strong></td><td><strong>203156.85</strong></td><td class="perf-good"><strong>-23.3%</strong></td></tr>
+                                <tr><td>CUTLASS (Closed EP)</td><td>8</td><td>1</td><td>265061.79</td><td class="perf-good">0%</td></tr>
+                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><strong>188508.83</strong></td><td class="perf-neutral"><strong>-9.9%</strong></td></tr>
+                                <tr><td>CUTLASS (Closed EP)</td><td>4</td><td>1</td><td>209314.52</td><td class="perf-neutral">0%</td></tr>
+                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>2</strong></td><td><strong>2</strong></td><td><strong>211976.65</strong></td><td class="perf-neutral"><strong>-7.0%</strong></td></tr>
+                                <tr><td>CUTLASS (Closed EP)</td><td>2</td><td>1</td><td>227963.58</td><td class="perf-neutral">0%</td></tr>
+                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>8</strong></td><td><strong>8</strong></td><td><strong>267898.03</strong></td><td class="perf-bad"><strong>+15.5%</strong></td></tr>
+                                <tr><td>TRTLLM (Closed EP)</td><td>8</td><td>1</td><td>231924.01</td><td class="perf-bad">0%</td></tr>
+                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><strong>217835.41</strong></td><td class="perf-bad"><strong>+14.0%</strong></td></tr>
+                                <tr><td>TRTLLM (Closed EP)</td><td>4</td><td>1</td><td>191022.23</td><td class="perf-bad">0%</td></tr>
+                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>2</strong></td><td><strong>2</strong></td><td><strong>229135.21</strong></td><td class="perf-bad"><strong>+4.7%</strong></td></tr>
+                                <tr><td>TRTLLM (Closed EP)</td><td>2</td><td>1</td><td>218822.20</td><td class="perf-bad">0%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Key Insights Section -->
         <div class="insights-section">
-            <h2>Comprehensive Insights</h2>
+            <h2>Insights</h2>
             <div class="insights-grid">
                 <div class="insight-card">
                     <h3>📊 Conclusion</h3>
@@ -1449,61 +1533,7 @@ trtllm-bench \
                         }
                     },
                     tooltip: {
-                        enabled: false,
-                        external: function(context) {
-                            // Custom tooltip implementation
-                            const tooltipEl = document.getElementById('customTooltip');
-                            const tooltipModel = context.tooltip;
-                            
-                            if (tooltipModel.opacity === 0) {
-                                tooltipEl.style.display = 'none';
-                                return;
-                            }
-                            
-                            if (tooltipModel.body) {
-                                const dataPoint = tooltipModel.dataPoints[0];
-                                const dataset = context.chart.data.datasets[dataPoint.datasetIndex];
-                                const label = dataset.label;
-                                const value = dataPoint.raw;
-                                const epSize = context.chart.data.labels[dataPoint.dataIndex];
-                                
-                                // Calculate gap if comparing ideal vs actual
-                                let gapHtml = '';
-                                if (label.includes('Actual')) {
-                                    const idealDataset = context.chart.data.datasets.find(ds => 
-                                        ds.label.includes('Ideal') && ds.label.includes(label.split(' ')[0])
-                                    );
-                                    if (idealDataset) {
-                                        const idealValue = idealDataset.data[dataPoint.dataIndex];
-                                        const gap = ((value - idealValue) / idealValue * 100).toFixed(1);
-                                        const gapClass = gap > 0 ? 'gap-positive' : 'gap-negative';
-                                        const metricType = context.chart.options.scales.y.title.text.toLowerCase().includes('latency') ? 
-                                            'Latency' : 'Throughput';
-                                        const impact = gap > 0 ? 
-                                            (metricType === 'Latency' ? 'slower' : 'better') : 
-                                            (metricType === 'Latency' ? 'faster' : 'worse');
-                                        
-                                        gapHtml = `
-                                            <div class="tooltip-gap">
-                                                <strong>Performance Gap:</strong><br>
-                                                <span class="${gapClass}">${gap > 0 ? '+' : ''}${gap}% ${impact} than ideal</span>
-                                            </div>
-                                        `;
-                                    }
-                                }
-                                
-                                tooltipEl.querySelector('.tooltip-title').innerHTML = 
-                                    `${label} - EP Size: ${epSize}`;
-                                tooltipEl.querySelector('.tooltip-content').innerHTML = 
-                                    `<strong>Value:</strong> ${value.toLocaleString()}`;
-                                tooltipEl.querySelector('.tooltip-gap').innerHTML = gapHtml;
-                            }
-                            
-                            const position = context.chart.canvas.getBoundingClientRect();
-                            tooltipEl.style.display = 'block';
-                            tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-                            tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
-                        }
+                        enabled: true
                     }
                 },
                 scales: {
@@ -1834,6 +1864,96 @@ trtllm-bench \
                         ]
                     },
                     options: randomScalingOptions
+                });
+            }
+
+            // Expert Parallelism Latency Chart
+            const epLatencyCtx = document.getElementById('ep-latency-chart');
+            if (epLatencyCtx) {
+                const epOptions = JSON.parse(JSON.stringify(commonOptions));
+                epOptions.scales.y.title.text = 'Total Latency (ms)';
+                
+                new Chart(epLatencyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['8 GPUs', '4 GPUs', '2 GPUs'],
+                        datasets: [
+                            {
+                                label: 'CUTLASS Open EP',
+                                data: [203156.85, 188508.83, 211976.65],
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                borderColor: '#10b981',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'CUTLASS Closed EP',
+                                data: [265061.79, 209314.52, 227963.58],
+                                backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                                borderColor: '#f59e0b',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'TRTLLM Open EP',
+                                data: [267898.03, 217835.41, 229135.21],
+                                backgroundColor: 'rgba(96, 165, 250, 0.7)',
+                                borderColor: '#60a5fa',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'TRTLLM Closed EP',
+                                data: [231924.01, 191022.23, 218822.20],
+                                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                                borderColor: '#ef4444',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: epOptions
+                });
+            }
+
+            // Expert Parallelism Throughput Chart
+            const epThroughputCtx = document.getElementById('ep-throughput-chart');
+            if (epThroughputCtx) {
+                const epOptions = JSON.parse(JSON.stringify(commonOptions));
+                epOptions.scales.y.title.text = 'Output Throughput/GPU (tok/s)';
+                
+                new Chart(epThroughputCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['8 GPUs', '4 GPUs', '2 GPUs'],
+                        datasets: [
+                            {
+                                label: 'CUTLASS Open EP',
+                                data: [19355.29, 20859.29, 18549.97],
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                borderColor: '#10b981',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'CUTLASS Closed EP',
+                                data: [14834.88, 18785.89, 17249.07],
+                                backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                                borderColor: '#f59e0b',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'TRTLLM Open EP',
+                                data: [14677.82, 18051.06, 17160.87],
+                                backgroundColor: 'rgba(96, 165, 250, 0.7)',
+                                borderColor: '#60a5fa',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'TRTLLM Closed EP',
+                                data: [16954.52, 20584.83, 17969.66],
+                                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                                borderColor: '#ef4444',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: epOptions
                 });
             }
 
