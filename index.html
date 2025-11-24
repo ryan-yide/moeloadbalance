@@ -1650,7 +1650,7 @@ trtllm-bench \
 
                     <div class="regime-grid">
                         <div class="regime-card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%);">
-                            <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">📈 Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
+                            <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
                             <ul style="padding-left: 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
                                 <li style="margin-bottom: 8px;"><strong>Mechanism:</strong> GPT-OSS-120B is too large for a single GPU's HBM bandwidth. Inference is stall-bound waiting for weights.</li>
                                 <li style="margin-bottom: 8px;"><strong>Scaling:</strong> As \(N\) increases, we aggregate HBM bandwidth. The memory term \(\frac{T_{mem}}{N}\) dominates the equation.</li>
@@ -1659,7 +1659,7 @@ trtllm-bench \
                         </div>
 
                         <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
-                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">📉 Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
+                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
                             <ul style="padding-left: 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
                                 <li style="margin-bottom: 8px;"><strong>The Inflection Point:</strong> At 8 GPUs, the memory access time is already minimal (diminishing returns).</li>
                                 <li style="margin-bottom: 8px;"><strong>Small Message Penalty:</strong> MoE EP requires All-to-All. As \(N\) grows, the message size per peer (\(Batch/N\)) shrinks. NVLink bandwidth utilization drops for small messages, making the system <strong>Latency-Bound</strong>.</li>
