@@ -860,9 +860,9 @@
                     <h2>⚙️ Run High Throughput Benchmark Command</h2>
                 </div>
                 <div class="section-content">
-                    <!-- Enable Perfect Router Command -->
+                    <!-- Enable Round Robin Command -->
                     <div class="command-section" style="margin-top: 0; margin-bottom: 32px;">
-                        <h2 style="color: #60a5fa;">Enable Perfect Router</h2>
+                        <h2 style="color: #60a5fa;">Enable Round Robin</h2>
                         <div class="code-block">
                             <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
                             <code>export ENABLE_PERFECT_ROUTER=1</code>
@@ -1167,7 +1167,7 @@ trtllm-bench \
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">🥈 DeepSeek-R1 (8 GPU)</span>
-                        <span class="metric-value">3,111 tok/s/gpu (Perfect Router)</span>
+                        <span class="metric-value">3,111 tok/s/gpu (Round Robin)</span>
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">GPT-OSS-120B (8 GPU)</span>
@@ -1175,30 +1175,30 @@ trtllm-bench \
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">Qwen3-235B (8 GPU)</span>
-                        <span class="metric-value">1,426 tok/s/gpu (Perfect Router)</span>
+                        <span class="metric-value">1,426 tok/s/gpu (Round Robin)</span>
                     </div>
                 </div>
 
                 <div class="result-card">
                     <h3>
-                        ⚡ Perfect Router Impact
+                        ⚡ Round Robin Impact
                         <span class="winner-badge">Performance Boost</span>
                     </h3>
                     <div class="result-metric">
                         <span class="metric-label">DeepSeek-V3 (8 GPU)</span>
-                        <span class="metric-value" style="color: #10b981;">+12.9% with Perfect Router</span>
+                        <span class="metric-value" style="color: #10b981;">+12.9% with Round Robin</span>
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">DeepSeek-V3 (7 GPU)</span>
-                        <span class="metric-value" style="color: #10b981;">+7.2% with Perfect Router</span>
+                        <span class="metric-value" style="color: #10b981;">+7.2% with Round Robin</span>
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">Qwen3-235B (8 GPU)</span>
-                        <span class="metric-value" style="color: #10b981;">+5.0% with Perfect Router</span>
+                        <span class="metric-value" style="color: #10b981;">+5.0% with Round Robin</span>
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">Observation</span>
-                        <span class="metric-value" style="font-size: 0.9rem; color: #8E8E93;">Perfect Router provides consistent gains across models</span>
+                        <span class="metric-value" style="font-size: 0.9rem; color: #8E8E93;">Round Robin provides consistent gains across models</span>
                     </div>
                 </div>
             </div> -->
@@ -1214,9 +1214,9 @@ trtllm-bench \
                     </div>
                 </div>
 
-                <!-- Perfect Router Impact Chart -->
+                <!-- Round Robin Impact Chart -->
                 <div class="chart-container">
-                    <h3>Perfect Router Impact on Throughput</h3>
+                    <h3>Round Robin Impact on Throughput</h3>
                     <div class="chart-wrapper">
                         <canvas id="sharegpt-perfect-router-chart"></canvas>
                     </div>
@@ -1242,7 +1242,7 @@ trtllm-bench \
                                 <td><strong>GPT-OSS-120B</strong></td>
                                 <td><strong>8</strong></td>
                                 <td><strong>CUTLASS</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td class="perf-good"><strong>23,702</strong></td>
                                 <td>W4A8_MXFP4_MXFP8</td>
                             </tr>
@@ -1258,7 +1258,7 @@ trtllm-bench \
                                 <td>GPT-OSS-120B</td>
                                 <td>8</td>
                                 <td>TRT-LLM</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td>17,739</td>
                                 <td>W4A8_MXFP4_MXFP8</td>
                             </tr>
@@ -1275,7 +1275,7 @@ trtllm-bench \
                                 <td><strong>DeepSeek-V3</strong></td>
                                 <td><strong>8</strong></td>
                                 <td><strong>DeepGeMM</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td class="perf-good"><strong>3,061</strong></td>
                                 <td>FP8_BLOCK_SCALES</td>
                             </tr>
@@ -1291,7 +1291,7 @@ trtllm-bench \
                                 <td>DeepSeek-V3</td>
                                 <td>7</td>
                                 <td>DeepGeMM</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td>3,409</td>
                                 <td>FP8_BLOCK_SCALES</td>
                             </tr>
@@ -1308,7 +1308,7 @@ trtllm-bench \
                                 <td><strong>DeepSeek-R1</strong></td>
                                 <td><strong>8</strong></td>
                                 <td><strong>DeepGeMM</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td class="perf-good"><strong>3,111</strong></td>
                                 <td>FP8_BLOCK_SCALES</td>
                             </tr>
@@ -1325,7 +1325,7 @@ trtllm-bench \
                                 <td><strong>Qwen3-235B-A22B</strong></td>
                                 <td><strong>8</strong></td>
                                 <td><strong>CUTLASS</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td class="perf-neutral"><strong>1,426</strong></td>
                                 <td>NA</td>
                             </tr>
@@ -1343,9 +1343,9 @@ trtllm-bench \
                     <div style="margin-top: 30px; padding: 20px; background: rgba(94,92,230,0.05); border-radius: 12px; border-left: 4px solid #5E5CE6;">
                         <h4 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.1rem;">💡 Key Observations</h4>
                         <ul style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
-                            <li><strong>GPT-OSS-120B dominates</strong> with 23,702 tok/s/gpu (Perfect Router), achieving 7.7x throughput vs DeepSeek-V3</li>
-                            <li><strong>DeepSeek models show consistency</strong>: DeepSeek-R1 and V3 achieve similar performance (~3,061-3,111 tok/s/gpu with Perfect Router)</li>
-                            <li><strong>Perfect Router provides 5-13% boost</strong>: Most significant gains seen in DeepSeek-V3 (12.9% at 8 GPUs)</li>
+                            <li><strong>GPT-OSS-120B dominates</strong> with 23,702 tok/s/gpu (Round Robin), achieving 7.7x throughput vs DeepSeek-V3</li>
+                            <li><strong>DeepSeek models show consistency</strong>: DeepSeek-R1 and V3 achieve similar performance (~3,061-3,111 tok/s/gpu with Round Robin)</li>
+                            <li><strong>Round Robin provides 5-13% boost</strong>: Most significant gains seen in DeepSeek-V3 (12.9% at 8 GPUs)</li>
                             <li><strong>GPU count matters</strong>: DeepSeek-V3 achieves higher per-GPU throughput with 7 GPUs (3,409) vs 8 GPUs (3,061), suggesting potential load balancing issues</li>
                             <li><strong>Quantization impact</strong>: W4A8 quantization (GPT-OSS) shows significantly better performance than FP8_BLOCK_SCALES (DeepSeek)</li>
                         </ul>
@@ -1627,7 +1627,7 @@ trtllm-bench \
                 <!-- Theoretical Analysis Section -->
                 <div class="analysis-container">
                     <h2 style="color: #60a5fa; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                        📐 Theoretical Analysis: The Physics of Scaling
+                        Theoretical Analysis: The Physics of Scaling
                     </h2>
                     
                     <p style="color: #cbd5e1; margin-bottom: 25px; font-size: 1.05rem; line-height: 1.7;">
@@ -1957,7 +1957,7 @@ trtllm-bench \
                         </div>
 
                         <div class="chart-container">
-                            <h3>Perfect Router Impact on Throughput</h3>
+                            <h3>Round Robin Impact on Throughput</h3>
                             <div class="chart-wrapper">
                                 <canvas id="random-8gpu-perfect-router-chart"></canvas>
                             </div>
@@ -1988,7 +1988,7 @@ trtllm-bench \
                                     <tr>
                                         <td>GPT-OSS-120B</td>
                                         <td>CUTLASS</td>
-                                        <td>Perfect Router</td>
+                                        <td>Round Robin</td>
                                         <td class="perf-good">23,696</td>
                                         <td>165,942</td>
                                         <td>W4A8_MXFP4_MXFP8</td>
@@ -2004,7 +2004,7 @@ trtllm-bench \
                                     <tr>
                                         <td>GPT-OSS-120B</td>
                                         <td>TRT-LLM</td>
-                                        <td>Perfect Router</td>
+                                        <td>Round Robin</td>
                                         <td>17,665</td>
                                         <td>222,592</td>
                                         <td>W4A8_MXFP4_MXFP8</td>
@@ -2020,7 +2020,7 @@ trtllm-bench \
                                     <tr>
                                         <td>Qwen3-235B-A22B</td>
                                         <td>CUTLASS</td>
-                                        <td>Perfect Router</td>
+                                        <td>Round Robin</td>
                                         <td class="perf-neutral">3,219</td>
                                         <td>1,221,393</td>
                                         <td>NA</td>
@@ -2036,7 +2036,7 @@ trtllm-bench \
                                     <tr>
                                         <td>Qwen3-235B-A22B</td>
                                         <td>TRT-LLM</td>
-                                        <td>Perfect Router</td>
+                                        <td>Round Robin</td>
                                         <td>3,188</td>
                                         <td>1,233,305</td>
                                         <td>NA</td>
@@ -2052,7 +2052,7 @@ trtllm-bench \
                                     <tr>
                                         <td>DeepSeek-V3</td>
                                         <td>DeepGeMM</td>
-                                        <td>Perfect Router</td>
+                                        <td>Round Robin</td>
                                         <td class="perf-neutral">3,081</td>
                                         <td>1,276,345</td>
                                         <td>FP8_BLOCK_SCALES</td>
@@ -2068,7 +2068,7 @@ trtllm-bench \
                                     <tr>
                                         <td>DeepSeek-R1</td>
                                         <td>DeepGeMM</td>
-                                        <td>Perfect Router</td>
+                                        <td>Round Robin</td>
                                         <td class="perf-neutral">3,107</td>
                                         <td>1,265,684</td>
                                         <td>FP8_BLOCK_SCALES</td>
@@ -2083,7 +2083,7 @@ trtllm-bench \
                                 <li><strong>GPT-OSS-120B dominates</strong>: Achieves 7.5x higher throughput than DeepSeek models with W4A8 quantization</li>
                                 <li><strong>CUTLASS vs TRT-LLM</strong>: CUTLASS shows significant advantage for GPT-OSS-120B (+31.9%), but minimal difference for Qwen3 (+1.6%)</li>
                                 <li><strong>Model size impact</strong>: Larger models (DeepSeek 671B, Qwen 235B) show dramatically lower per-GPU throughput vs GPT-OSS-120B (120B)</li>
-                                <li><strong>Perfect Router benefits</strong>: All models gain 11-20% throughput improvement with Perfect Router, with DeepSeek-R1 showing highest gain (+20.1%)</li>
+                                <li><strong>Round Robin benefits</strong>: All models gain 11-20% throughput improvement with Round Robin, with DeepSeek-R1 showing highest gain (+20.1%)</li>
                                 <li><strong>DeepGeMM backend</strong>: Required for ultra-large models (DeepSeek), performs comparably to CUTLASS/TRT-LLM for similar-sized models</li>
                             </ul>
                         </div>
@@ -2136,24 +2136,24 @@ trtllm-bench \
 
                 <div class="result-card">
                     <h3>
-                        ⚡ Perfect Router Impact
+                        ⚡ Round Robin Impact
                         <span class="winner-badge">Load Balance Analysis</span>
                     </h3>
                     <div class="result-metric">
                         <span class="metric-label">GPT-OSS (8 GPU, CUTLASS)</span>
-                        <span class="metric-value" style="color: #10b981;">+9.4% with Perfect Router</span>
+                        <span class="metric-value" style="color: #10b981;">+9.4% with Round Robin</span>
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">GPT-OSS (8 GPU, TRT-LLM)</span>
-                        <span class="metric-value" style="color: #10b981;">+11.1% with Perfect Router</span>
+                        <span class="metric-value" style="color: #10b981;">+11.1% with Round Robin</span>
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">DeepSeek-V3 (8 GPU)</span>
-                        <span class="metric-value" style="color: #10b981;">+6.4% with Perfect Router</span>
+                        <span class="metric-value" style="color: #10b981;">+6.4% with Round Robin</span>
                     </div>
                     <div class="result-metric">
                         <span class="metric-label">Qwen3-235B (8 GPU)</span>
-                        <span class="metric-value" style="color: #10b981;">+7.2% with Perfect Router</span>
+                        <span class="metric-value" style="color: #10b981;">+7.2% with Round Robin</span>
                     </div>
                 </div>
             </div>
@@ -2186,9 +2186,9 @@ trtllm-bench \
                     </div>
                 </div>
 
-                <!-- openMath Perfect Router Impact Chart -->
+                <!-- openMath Round Robin Impact Chart -->
                 <div class="chart-container">
-                    <h3>Perfect Router Impact on Throughput (8 GPUs)</h3>
+                    <h3>Round Robin Impact on Throughput (8 GPUs)</h3>
                     <div class="chart-wrapper">
                         <canvas id="openmath-gap-chart"></canvas>
                     </div>
@@ -2212,7 +2212,7 @@ trtllm-bench \
                             <tr>
                                 <td>1</td>
                                 <td>CUTLASS</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td class="perf-good">24,221</td>
                                 <td>162,346</td>
                                 <td class="perf-good">0% (Ideal)</td>
@@ -2228,7 +2228,7 @@ trtllm-bench \
                             <tr>
                                 <td>2</td>
                                 <td>CUTLASS</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td class="perf-good">29,646</td>
                                 <td>132,639</td>
                                 <td class="perf-good">0% (Ideal)</td>
@@ -2244,7 +2244,7 @@ trtllm-bench \
                             <tr class="highlight">
                                 <td><strong>4</strong></td>
                                 <td><strong>CUTLASS</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td class="perf-good"><strong>31,206</strong></td>
                                 <td><strong>126,008</strong></td>
                                 <td class="perf-good"><strong>0% (Ideal)</strong></td>
@@ -2260,7 +2260,7 @@ trtllm-bench \
                             <tr class="highlight">
                                 <td><strong>8</strong></td>
                                 <td><strong>CUTLASS</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td class="perf-good"><strong>32,565</strong></td>
                                 <td><strong>120,749</strong></td>
                                 <td class="perf-good"><strong>0% (Ideal)</strong></td>
@@ -2276,7 +2276,7 @@ trtllm-bench \
                             <tr>
                                 <td>1</td>
                                 <td>TRT-LLM</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td class="perf-neutral">24,067</td>
                                 <td>163,387</td>
                                 <td class="perf-good">0% (Ideal)</td>
@@ -2292,7 +2292,7 @@ trtllm-bench \
                             <tr>
                                 <td>2</td>
                                 <td>TRT-LLM</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td class="perf-neutral">28,824</td>
                                 <td>136,420</td>
                                 <td class="perf-good">0% (Ideal)</td>
@@ -2308,7 +2308,7 @@ trtllm-bench \
                             <tr>
                                 <td>4</td>
                                 <td>TRT-LLM</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td class="perf-neutral">26,630</td>
                                 <td>147,660</td>
                                 <td class="perf-good">0% (Ideal)</td>
@@ -2324,7 +2324,7 @@ trtllm-bench \
                             <tr>
                                 <td>8</td>
                                 <td>TRT-LLM</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td class="perf-neutral">24,967</td>
                                 <td>157,492</td>
                                 <td class="perf-good">0% (Ideal)</td>
@@ -2357,7 +2357,7 @@ trtllm-bench \
                             <tr class="highlight" style="background: rgba(16, 185, 129, 0.15);">
                                 <td><strong>GPT-OSS-120B</strong></td>
                                 <td><strong>CUTLASS</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td><strong>8192</strong></td>
                                 <td class="perf-good"><strong>32,565</strong></td>
                                 <td>120,749</td>
@@ -2375,7 +2375,7 @@ trtllm-bench \
                             <tr>
                                 <td>GPT-OSS-120B</td>
                                 <td>TRT-LLM</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td>8192</td>
                                 <td>24,967</td>
                                 <td>157,492</td>
@@ -2393,7 +2393,7 @@ trtllm-bench \
                             <tr class="highlight" style="background: rgba(239, 68, 68, 0.15);">
                                 <td><strong>DeepSeek-V3</strong></td>
                                 <td><strong>DeepGeMM</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td><strong>2048</strong></td>
                                 <td class="perf-neutral"><strong>5,154</strong></td>
                                 <td>763,005</td>
@@ -2411,7 +2411,7 @@ trtllm-bench \
                             <tr class="highlight" style="background: rgba(168, 85, 247, 0.15);">
                                 <td><strong>DeepSeek-R1</strong></td>
                                 <td><strong>DeepGeMM</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td><strong>2048</strong></td>
                                 <td class="perf-neutral"><strong>5,124</strong></td>
                                 <td>767,473</td>
@@ -2429,7 +2429,7 @@ trtllm-bench \
                             <tr class="highlight" style="background: rgba(245, 158, 11, 0.15);">
                                 <td><strong>Qwen3-235B-A22B</strong></td>
                                 <td><strong>CUTLASS</strong></td>
-                                <td><strong>Perfect Router</strong></td>
+                                <td><strong>Round Robin</strong></td>
                                 <td><strong>2048</strong></td>
                                 <td class="perf-neutral"><strong>5,063</strong></td>
                                 <td>776,678</td>
@@ -2447,7 +2447,7 @@ trtllm-bench \
                             <tr>
                                 <td>Qwen3-235B-A22B</td>
                                 <td>TRT-LLM</td>
-                                <td>Perfect Router</td>
+                                <td>Round Robin</td>
                                 <td>2048</td>
                                 <td>5,059</td>
                                 <td>777,266</td>
@@ -2468,12 +2468,12 @@ trtllm-bench \
                     <div style="margin-top: 30px; padding: 20px; background: rgba(94,92,230,0.08); border-radius: 12px; border-left: 4px solid #5E5CE6;">
                         <h4 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.1rem;">💡 Key Observations (openMath Dataset)</h4>
                         <ul style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
-                            <li><strong>GPT-OSS-120B achieves exceptional performance</strong>: 32,565 tok/s/gpu at 8 GPUs with Perfect Router - 6.3x higher than DeepSeek models despite longer output sequence (8192 vs 2048 tokens)</li>
+                            <li><strong>GPT-OSS-120B achieves exceptional performance</strong>: 32,565 tok/s/gpu at 8 GPUs with Round Robin - 6.3x higher than DeepSeek models despite longer output sequence (8192 vs 2048 tokens)</li>
                             <li><strong>Longer output sequences boost throughput</strong>: GPT-OSS shows 40-68% higher per-GPU throughput with 8k outputs vs 2k outputs on Random/ShareGPT datasets, demonstrating memory-bound decode efficiency</li>
-                            <li><strong>Perfect Router shows consistent 6-11% gains</strong>: All models benefit from perfect routing, with TRT-LLM showing slightly higher improvement (10-11%) vs CUTLASS (6-9%)</li>
+                            <li><strong>Round Robin shows consistent 6-11% gains</strong>: All models benefit from perfect routing, with TRT-LLM showing slightly higher improvement (10-11%) vs CUTLASS (6-9%)</li>
                             <li><strong>CUTLASS maintains advantage</strong>: For GPT-OSS-120B, CUTLASS outperforms TRT-LLM by 30-45% across all GPU counts, confirming backend superiority for this model</li>
                             <li><strong>Scaling efficiency improves with load</strong>: Unlike 2k-output workloads that peak at 4 GPUs, the 8k-output math workload shows continued throughput growth to 8 GPUs (32,565 tok/s/gpu), suggesting better amortization of communication overhead with longer decode phases</li>
-                            <li><strong>DeepSeek and Qwen show parity</strong>: All three large models (DeepSeek-V3, DeepSeek-R1, Qwen3-235B) achieve similar ~5k tok/s/gpu with Perfect Router, indicating model size is the primary bottleneck</li>
+                            <li><strong>DeepSeek and Qwen show parity</strong>: All three large models (DeepSeek-V3, DeepSeek-R1, Qwen3-235B) achieve similar ~5k tok/s/gpu with Round Robin, indicating model size is the primary bottleneck</li>
                         </ul>
                     </div>
 
@@ -2809,7 +2809,7 @@ trtllm-bench \
                 new Chart(sharegptModelComparisonCtx, {
                     type: 'bar',
                     data: {
-                        labels: ['GPT-OSS-120B\n(Perfect Router)', 'GPT-OSS-120B\n(Default)', 'GPT-OSS-120B\n(TRT-LLM Perfect)', 'GPT-OSS-120B\n(TRT-LLM Default)', 'DeepSeek-V3\n(Perfect Router)', 'DeepSeek-V3\n(Default)', 'DeepSeek-R1\n(Perfect Router)', 'DeepSeek-R1\n(Default)', 'Qwen3-235B\n(Perfect Router)', 'Qwen3-235B\n(Default)'],
+                        labels: ['GPT-OSS-120B\n(Round Robin)', 'GPT-OSS-120B\n(Default)', 'GPT-OSS-120B\n(TRT-LLM Perfect)', 'GPT-OSS-120B\n(TRT-LLM Default)', 'DeepSeek-V3\n(Round Robin)', 'DeepSeek-V3\n(Default)', 'DeepSeek-R1\n(Round Robin)', 'DeepSeek-R1\n(Default)', 'Qwen3-235B\n(Round Robin)', 'Qwen3-235B\n(Default)'],
                         datasets: [{
                             label: 'Throughput (tok/s/gpu)',
                             data: [23702, 22051, 17739, 16425, 3061, 2712, 3111, 2854, 1426, 1358],
@@ -2857,7 +2857,7 @@ trtllm-bench \
                 });
             }
 
-            // ShareGPT Perfect Router Impact Chart
+            // ShareGPT Round Robin Impact Chart
             const sharegptPerfectRouterCtx = document.getElementById('sharegpt-perfect-router-chart');
             if (sharegptPerfectRouterCtx) {
                 const perfectRouterOptions = JSON.parse(JSON.stringify(commonOptions));
@@ -3244,7 +3244,7 @@ trtllm-bench \
                         labels: ['1', '2', '4', '8'],
                         datasets: [
                             {
-                                label: 'CUTLASS (Perfect Router)',
+                                label: 'CUTLASS (Round Robin)',
                                 data: [16370.73, 21741.91, 23449.79, 23816.31],
                                 borderColor: '#10b981',
                                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -3271,7 +3271,7 @@ trtllm-bench \
                                 pointBorderWidth: 2
                             },
                             {
-                                label: 'TRTLLM (Perfect Router)',
+                                label: 'TRTLLM (Round Robin)',
                                 data: [null, 19891.90, 19736.75, 17664.95],
                                 borderColor: '#60a5fa',
                                 backgroundColor: 'rgba(96, 165, 250, 0.1)',
@@ -3402,7 +3402,7 @@ trtllm-bench \
                                 borderWidth: 2
                             },
                             {
-                                label: 'CUTLASS / DeepGeMM (Perfect Router)',
+                                label: 'CUTLASS / DeepGeMM (Round Robin)',
                                 data: [23696, 3219, 3081, 3107],
                                 backgroundColor: 'rgba(16, 185, 129, 0.9)',
                                 borderColor: '#10b981',
@@ -3416,7 +3416,7 @@ trtllm-bench \
                                 borderWidth: 2
                             },
                             {
-                                label: 'TRT-LLM (Perfect Router)',
+                                label: 'TRT-LLM (Round Robin)',
                                 data: [17665, 3188, 0, 0], // DeepSeek uses DeepGeMM only
                                 backgroundColor: 'rgba(239, 68, 68, 0.9)',
                                 borderColor: '#ef4444',
@@ -3428,7 +3428,7 @@ trtllm-bench \
                 });
             }
 
-            // Random Dataset 8-GPU Perfect Router Impact Chart
+            // Random Dataset 8-GPU Round Robin Impact Chart
             const random8GpuPerfectRouterCtx = document.getElementById('random-8gpu-perfect-router-chart');
             if (random8GpuPerfectRouterCtx) {
                 const perfectRouterOptions = JSON.parse(JSON.stringify(commonOptions));
@@ -3439,7 +3439,7 @@ trtllm-bench \
                     data: {
                         labels: ['GPT-OSS\nCUTLASS', 'GPT-OSS\nTRT-LLM', 'Qwen3\nCUTLASS', 'Qwen3\nTRT-LLM', 'DeepSeek-V3\nDeepGeMM', 'DeepSeek-R1\nDeepGeMM'],
                         datasets: [{
-                            label: 'Throughput Gain with Perfect Router (%)',
+                            label: 'Throughput Gain with Round Robin (%)',
                             data: [
                                 ((23696 - 19355) / 19355 * 100).toFixed(1),  // GPT CUTLASS: +22.4%
                                 ((17665 - 14678) / 14678 * 100).toFixed(1),  // GPT TRT-LLM: +20.3%
@@ -3485,7 +3485,7 @@ trtllm-bench \
                         labels: ['1', '2', '4', '8'],
                         datasets: [
                             {
-                                label: 'CUTLASS (Perfect Router)',
+                                label: 'CUTLASS (Round Robin)',
                                 data: [24221, 29646, 31206, 32565],
                                 borderColor: '#10b981',
                                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -3512,7 +3512,7 @@ trtllm-bench \
                                 pointBorderWidth: 2
                             },
                             {
-                                label: 'TRT-LLM (Perfect Router)',
+                                label: 'TRT-LLM (Round Robin)',
                                 data: [24067, 28824, 26630, 24967],
                                 borderColor: '#60a5fa',
                                 backgroundColor: 'rgba(96, 165, 250, 0.1)',
@@ -3556,7 +3556,7 @@ trtllm-bench \
                         labels: ['1', '2', '4', '8'],
                         datasets: [
                             {
-                                label: 'CUTLASS (Perfect Router)',
+                                label: 'CUTLASS (Round Robin)',
                                 data: [162346, 132639, 126008, 120749],
                                 borderColor: '#10b981',
                                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -3583,7 +3583,7 @@ trtllm-bench \
                                 pointBorderWidth: 2
                             },
                             {
-                                label: 'TRT-LLM (Perfect Router)',
+                                label: 'TRT-LLM (Round Robin)',
                                 data: [163387, 136420, 147660, 157492],
                                 borderColor: '#60a5fa',
                                 backgroundColor: 'rgba(96, 165, 250, 0.1)',
@@ -3689,7 +3689,7 @@ trtllm-bench \
                 });
             }
 
-            // openMath Perfect Router Impact Chart (8 GPUs, Multi-Model Comparison)
+            // openMath Round Robin Impact Chart (8 GPUs, Multi-Model Comparison)
             const openmathGapCtx = document.getElementById('openmath-gap-chart');
             if (openmathGapCtx) {
                 const gapOptions = JSON.parse(JSON.stringify(commonOptions));
@@ -3700,7 +3700,7 @@ trtllm-bench \
                     data: {
                         labels: ['GPT-OSS\nCUTLASS', 'GPT-OSS\nTRT-LLM', 'DeepSeek-V3\nDeepGeMM', 'DeepSeek-R1\nDeepGeMM', 'Qwen3-235B\nCUTLASS', 'Qwen3-235B\nTRT-LLM'],
                         datasets: [{
-                            label: 'Throughput Gain with Perfect Router (%)',
+                            label: 'Throughput Gain with Round Robin (%)',
                             data: [
                                 ((32565 - 29757) / 29757 * 100).toFixed(1),   // GPT-OSS CUTLASS: +9.4%
                                 ((24967 - 22467) / 22467 * 100).toFixed(1),   // GPT-OSS TRT-LLM: +11.1%
