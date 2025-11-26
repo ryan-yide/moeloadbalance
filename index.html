@@ -1667,6 +1667,20 @@ trtllm-bench \
                     </p>
 
                     <div class="math-block" style="border-left-color: #60a5fa;">
+                        <p style="color: #e2e8f0; margin-bottom: 10px; font-weight: 600;">Notation and Setup</p>
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">
+                            We use the following notation to model the scaling behavior:
+                        </p>
+                        <ul style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.6; padding-left: 20px; margin-bottom: 15px;">
+                            <li style="margin-bottom: 6px;"><strong>\(N\):</strong> Number of GPUs participating in expert parallelism (EP group size, e.g., \(N \in \{1,2,4,8\}\)).</li>
+                            <li style="margin-bottom: 6px;"><strong>\(\text{Batch}_{\text{gpu}}\):</strong> Effective batch size <strong>per GPU</strong> during decode (number of active sequences; in our random dataset benchmark this is fixed to 640 per GPU, so global batch is \(N \times 640\)).</li>
+                            <li style="margin-bottom: 6px;"><strong>\(Q_{\text{gpu}}(N)\):</strong> Per-GPU output throughput, measured as \(\frac{\text{total new tokens generated}}{N \times \text{total decode time}}\).</li>
+                            <li style="margin-bottom: 6px;"><strong>\(T(N)\):</strong> End-to-end <strong>decode step</strong> latency with \(N\) GPUs (dominated by the generation phase for our 2k-token outputs).</li>
+                            <li style="margin-bottom: 6px;"><strong>\(T_{\text{mem}}(1)\):</strong> The memory-bound part of the step latency on a <strong>single</strong> GPU (time spent waiting on HBM / weight loads).</li>
+                            <li style="margin-bottom: 6px;"><strong>\(T_{\text{overhead}}\):</strong> Launch and framework overheads that are essentially independent of \(N\) (kernel launches, scheduling, host-device sync, etc.).</li>
+                            <li style="margin-bottom: 6px;"><strong>\(T_{\text{comm}}(N)\):</strong> Communication latency introduced by MoE all-to-all and related collectives when we scale \(N\).</li>
+                        </ul>
+                        
                         <p style="color: #e2e8f0; margin-bottom: 10px; font-weight: 600;">1. The Throughput-Latency Inverse Relationship</p>
                         <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">
                             In a weak scaling setup (fixed batch size \(B\) per GPU), the Per-GPU Throughput \(Q(N)\) is strictly governed by the end-to-end step latency \(T(N)\):
@@ -1674,10 +1688,10 @@ trtllm-bench \
                         $$ Q_{\text{gpu}}(N) = \frac{\text{Batch}_{\text{gpu}}}{T(N)} \propto \frac{1}{T(N)} $$
                         
                         <p style="color: #e2e8f0; margin-top: 20px; margin-bottom: 10px; font-weight: 600;">2. Latency Decomposition (Amdahl's Law Extended)</p>
-                        <p style="color: #94a3b8; font-size: 0.9rem;">
-                            The single-step latency \(T(N)\) consists of the parallelizable computation/memory access and the serialization overhead (communication):
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">
+                            The single-step latency \(T(N)\) can then be decomposed as:
                         </p>
-                        $$ T(N) \approx \underbrace{\frac{T_{\text{mem}}(1)}{N}}_{\text{Gain: Memory Aggregation}} + \underbrace{T_{\text{overhead}}}_{\text{Fixed: Kernel Launch}} + \underbrace{T_{\text{comm}}(N)}_{\text{Loss: All-to-All}} $$
+                        $$ T(N) \approx \underbrace{\frac{T_{\text{mem}}(1)}{N}}_{\text{Gain: aggregate HBM bandwidth}} + \underbrace{T_{\text{overhead}}}_{\text{Fixed: launch / runtime}} + \underbrace{T_{\text{comm}}(N)}_{\text{Loss: MoE all-to-all}} $$
                     </div>
 
                     <div class="regime-grid">
@@ -1685,8 +1699,9 @@ trtllm-bench \
                             <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
                             <ul style="padding-left: 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
                                 <li style="margin-bottom: 8px;"><strong>Mechanism:</strong> GPT-OSS-120B is too large for a single GPU's HBM bandwidth. Inference is stall-bound waiting for weights.</li>
-                                <li style="margin-bottom: 8px;"><strong>Scaling:</strong> As \(N\) increases, we aggregate HBM bandwidth. The memory term \(\frac{T_{mem}}{N}\) dominates the equation.</li>
+                                <li style="margin-bottom: 8px;"><strong>Scaling:</strong> As \(N\) increases, we aggregate HBM bandwidth. The memory term \(\frac{T_{\text{mem}}(1)}{N}\) dominates the equation.</li>
                                 <li style="margin-bottom: 8px;"><strong>Result:</strong> Latency drops linearly (\(T \downarrow\)), causing Throughput to rise linearly (\(Q \uparrow\)).</li>
+                                <li style="margin-bottom: 8px;"><strong>Observed in Benchmark:</strong> In our random-dataset benchmark we keep \(\text{Batch}_{\text{gpu}}\) fixed (640 sequences per GPU), so any increase in \(Q_{\text{gpu}}(N)\) from 1 → 4 GPUs comes purely from reducing \(T(N)\) via aggregate HBM bandwidth.</li>
                             </ul>
                         </div>
 
@@ -1694,8 +1709,9 @@ trtllm-bench \
                             <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
                             <ul style="padding-left: 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
                                 <li style="margin-bottom: 8px;"><strong>The Inflection Point:</strong> At 8 GPUs, the memory access time is already minimal (diminishing returns).</li>
-                                <li style="margin-bottom: 8px;"><strong>Small Message Penalty:</strong> MoE EP requires All-to-All. As \(N\) grows, the message size per peer (\(Batch/N\)) shrinks. NVLink bandwidth utilization drops for small messages, making the system <strong>Latency-Bound</strong>.</li>
-                                <li style="margin-bottom: 8px;"><strong>Result:</strong> \(T_{comm}\) rises faster than \(T_{mem}\) falls. Total Latency increases, Throughput drops.</li>
+                                <li style="margin-bottom: 8px;"><strong>Small Message Penalty:</strong> MoE EP requires All-to-All. As \(N\) grows, the message size per peer (\(\text{Batch}/N\)) shrinks. NVLink bandwidth utilization drops for small messages, making the system <strong>Latency-Bound</strong>.</li>
+                                <li style="margin-bottom: 8px;"><strong>Result:</strong> \(T_{\text{comm}}(N)\) rises faster than \(T_{\text{mem}}(1)\) falls. Total Latency increases, Throughput drops.</li>
+                                <li style="margin-bottom: 8px;"><strong>Observed in Benchmark:</strong> The drop at 8 GPUs reflects \(T_{\text{comm}}(N)\) starting to dominate, turning the curve from linear growth to performance degradation.</li>
                             </ul>
                         </div>
                     </div>
@@ -2123,10 +2139,28 @@ trtllm-bench \
                         <!-- MoE Expert Load Balance Heatmap -->
                         <div style="margin-top: 40px;">
                             <h3 style="color: #60a5fa; margin-bottom: 20px; font-size: 1.5rem;">MoE Expert Load Balance Analysis</h3>
+                            
+                            <!-- Nsight Profiling Images -->
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px;">
+                                <div style="background: rgba(20, 20, 22, 0.6); border: 1px solid rgba(94, 92, 230, 0.2); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
+                                    <img src="./images/forward_step.png" alt="Nsight Profiling - Forward Step Timeline" style="max-width: 100%; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 6px 30px rgba(0,0,0,0.5); margin: 0 auto; display: block;">
+                                    <p style="text-align: center; color: #8E8E93; margin-top: 20px; font-style: italic; font-size: 0.95rem;">
+                                        <strong>Figure:</strong> Nsight Systems timeline showing a complete forward step of inference.
+                                    </p>
+                                </div>
+                                
+                                <div style="background: rgba(20, 20, 22, 0.6); border: 1px solid rgba(94, 92, 230, 0.2); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
+                                    <img src="./images/moe_cutlass_kernel.png" alt="Nsight Profiling - MoE CUTLASS Kernel Detail" style="max-width: 100%; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 6px 30px rgba(0,0,0,0.5); margin: 0 auto; display: block;">
+                                    <p style="text-align: center; color: #8E8E93; margin-top: 20px; font-style: italic; font-size: 0.95rem;">
+                                        <strong>Figure:</strong> Nsight profiling of a complete Transformer block execution, showing the sequence of Attention, MoE component computation, and associated kernel launches with timing breakdown.
+                                    </p>
+                                </div>
+                            </div>
+                            
                             <div style="background: rgba(20, 20, 22, 0.6); border: 1px solid rgba(94, 92, 230, 0.2); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
                                 <img src="./images/step000_heatmap.png" alt="MoE Expert Load Distribution Heatmap - Random Dataset" style="max-width: 100%; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 6px 30px rgba(0,0,0,0.5); margin: 0 auto; display: block;">
                                 <p style="text-align: center; color: #8E8E93; margin-top: 20px; font-style: italic; font-size: 0.95rem; max-width: 900px; margin-left: auto; margin-right: auto;">
-                                    <strong>Figure:</strong> Expert load distribution heatmap for <strong style="color: #60a5fa;">GPT-OSS-120B</strong> on Random Dataset (1k input / 2k output) showing the routing pattern across MoE layers. The visualization reveals load imbalance issues where certain experts receive disproportionate token assignments, leading to performance bottlenecks. Darker regions indicate higher load concentration, while lighter areas show underutilized experts.
+                                    <strong>Figure:</strong> Expert load distribution heatmap for GPT-OSS-120B (Random Dataset). The visualization maps routing density directly to hardware latency. Darker regions (hotspots) indicate GPUs with longer kernel execution times - these GPUs host experts that attracted a large number of routed tokens, becoming the system's bottleneck. Lighter areas (coldspots) indicate GPUs that received fewer tokens, finishing their computation early and remaining idle while waiting at the synchronization barrier for overloaded GPUs to catch up. Note: The MoE kernel time refers to the <code>CutlassMoE_FusedMoE_Kernel</code> execution duration shown in the Nsight profiling timeline above.
                                 </p>
                             </div>
                         </div>
@@ -2500,10 +2534,28 @@ trtllm-bench \
                     <!-- MoE Expert Load Balance Heatmap -->
                     <div style="margin-top: 40px;">
                         <h3 style="color: #60a5fa; margin-bottom: 20px; font-size: 1.5rem;">MoE Expert Load Balance Analysis</h3>
+                        
+                        <!-- Nsight Profiling Images -->
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div style="background: rgba(20, 20, 22, 0.6); border: 1px solid rgba(94, 92, 230, 0.2); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
+                                <img src="./images/forward_step.png" alt="Nsight Profiling - Forward Step Timeline" style="max-width: 100%; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 6px 30px rgba(0,0,0,0.5); margin: 0 auto; display: block;">
+                                <p style="text-align: center; color: #8E8E93; margin-top: 20px; font-style: italic; font-size: 0.95rem;">
+                                    <strong>Figure:</strong> Nsight Systems timeline showing a complete forward step of MoE inference, revealing the kernel execution pattern and synchronization overhead.
+                                </p>
+                            </div>
+                            
+                            <div style="background: rgba(20, 20, 22, 0.6); border: 1px solid rgba(94, 92, 230, 0.2); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
+                                <img src="./images/moe_cutlass_kernel.png" alt="Nsight Profiling - MoE CUTLASS Kernel Detail" style="max-width: 100%; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 6px 30px rgba(0,0,0,0.5); margin: 0 auto; display: block;">
+                                <p style="text-align: center; color: #8E8E93; margin-top: 20px; font-style: italic; font-size: 0.95rem;">
+                                    <strong>Figure:</strong> Nsight profiling of a complete Transformer block execution, showing the sequence of attention, MoE layer computation, and associated kernel launches with timing breakdown.
+                                </p>
+                            </div>
+                        </div>
+                        
                         <div style="background: rgba(20, 20, 22, 0.6); border: 1px solid rgba(94, 92, 230, 0.2); border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
                             <img src="./images/step030_heatmap.png" alt="MoE Expert Load Distribution Heatmap" style="max-width: 100%; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 6px 30px rgba(0,0,0,0.5); margin: 0 auto; display: block;">
                             <p style="text-align: center; color: #8E8E93; margin-top: 20px; font-style: italic; font-size: 0.95rem; max-width: 900px; margin-left: auto; margin-right: auto;">
-                                <strong>Figure:</strong> Expert load distribution heatmap for <strong style="color: #60a5fa;">GPT-OSS-120B</strong> showing the routing pattern across MoE layers. The visualization reveals load imbalance issues where certain experts receive disproportionate token assignments, leading to performance bottlenecks. Darker regions indicate higher load concentration, while lighter areas show underutilized experts.
+                                <strong>Figure:</strong> Expert load distribution heatmap for GPT-OSS-120B (openMath Dataset). The visualization maps routing density directly to hardware latency. Darker regions (hotspots) indicate GPUs with longer kernel execution times - these GPUs host experts that attracted a disproportionately large number of routed tokens, becoming the system's bottleneck. Lighter areas (coldspots) indicate GPUs that received fewer tokens, finishing their computation early and remaining idle while waiting at the synchronization barrier for overloaded GPUs to catch up. Note: The MoE kernel time refers to the <code>CutlassMoE_FusedMoE_Kernel</code> execution duration shown in the Nsight profiling timeline above.
                             </p>
                         </div>
                     </div>
