@@ -946,7 +946,7 @@
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                             <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 15px;">
-                                <h4 style="color: #ef4444; margin-bottom: 10px; font-size: 1rem;">❌ Learned Router (Actual)</h4>
+                                <h4 style="color: #ef4444; margin-bottom: 10px; font-size: 1rem;">Real Router (Actual)</h4>
                                 <p style="color: #d1d5db; font-size: 0.9rem; line-height: 1.6;">
                                     Tokens cluster into "hotspot" experts (e.g., Expert A gets 80% of tokens). 
                                     GPU 1 runs at high load while GPU 2 experiences significant idle time, creating the <strong>Straggler Effect</strong>.
@@ -954,7 +954,7 @@
                             </div>
                             
                             <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 15px;">
-                                <h4 style="color: #10b981; margin-bottom: 10px; font-size: 1rem;">✅ Round Robin (Enforced)</h4>
+                                <h4 style="color: #10b981; margin-bottom: 10px; font-size: 1rem;">Round Robin (Enforced)</h4>
                                 <p style="color: #d1d5db; font-size: 0.9rem; line-height: 1.6;">
                                     Expert assignments are distributed <strong>as evenly as possible</strong> (±1 token difference). Token 1 → Expert A, Token 2 → Expert B... 
                                     GPUs achieve <strong>maximal effective utilization</strong> by eliminating routing skew.
@@ -989,45 +989,15 @@
                                 📊 Interpreting the Results
                             </p>
                             <p style="color: #d1d5db; line-height: 1.7; margin: 0;">
-                                The performance gap between "Round Robin" (control) and "Learned Router" (experimental) configurations 
-                                quantifies the <strong style="color: #fbbf24;">efficiency loss due to load imbalance</strong>. 
-                                For example, a 12.9% throughput gain with Round Robin on DeepSeek-V3 indicates that 
-                                the learned routing strategy incurs ~13% overhead relative to the hardware's theoretical peak under perfect load distribution.
+                                The performance gap between "Round Robin" (control) and "Learned Router" (real) configurations 
+                                quantifies the <strong style="color: #fbbf24;">efficiency gap due to load imbalance</strong>. 
+                                Across our benchmarks on GPT-OSS-120B (8 GPUs, CUTLASS), the learned routing strategy shows varying gap:
+                                <strong style="color: #fbbf24;">18.3%</strong> on Random Dataset (19,355 vs 23,696 tok/s/gpu),
+                                <strong style="color: #fbbf24;">7.5%</strong> on ShareGPT (22,051 vs 23,702 tok/s/gpu), and
+                                <strong style="color: #fbbf24;">8.6%</strong> on openMath (29,757 vs 32,565 tok/s/gpu),
+                                relative to the hardware's theoretical peak under perfect load distribution.
                             </p>
                         </div>
-                    </div>
-                    <div class="code-block">
-                        <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
-                        <textarea readonly style="height: auto;">#!/bin/bash
-
-num_gpus=4
-max_batch_size=640
-
-cat <<EOF > max_throughput.yaml
-enable_attention_dp: true
-cuda_graph_config:
-    max_batch_size: ${max_batch_size}
-    enable_padding: true
-stream_interval: 10
-moe_config:
-    backend: CUTLASS
-EOF
-
-trtllm-bench \
-    --model openai/gpt-oss-120b \
-    throughput \
-    --backend pytorch \
-    --tp ${num_gpus} \
-    --ep ${num_gpus} \
-    --extra_llm_api_options max_throughput.yaml \
-    --dataset gpt-oss-120b-1k2k.txt \
-    --max_batch_size ${max_batch_size} \
-    --concurrency $((max_batch_size * num_gpus)) \
-    --num_requests $((max_batch_size * num_gpus * 3)) \
-    --kv_cache_free_gpu_mem_fraction 0.9 \
-    --streaming \
-    --warmup 0 \
-    --report_json max_throughput_benchmark.json</textarea>
                     </div>
                 </div>
         </div>
@@ -1437,12 +1407,12 @@ trtllm-bench \
                     </div>
                 </div>
 
-                <div class="chart-container">
+                <!-- <div class="chart-container">
                     <h3>Total Latency Scaling (Lower is Better)</h3>
                     <div class="chart-wrapper">
                         <canvas id="sharegpt-latency-chart"></canvas>
                     </div>
-                </div>
+                </div> -->
                 
                 <div style="overflow-x: auto; margin-top: 30px;">
                     <h3>Throughput Performance (GPT-OSS-120B on ShareGPT)</h3>
@@ -2200,12 +2170,12 @@ trtllm-bench \
                 </div>
 
                 <!-- GPT-OSS-120B Latency Chart -->
-                <div class="chart-container">
+                <!-- <div class="chart-container">
                     <h3>GPT-OSS-120B Latency Scaling (Lower is Better)</h3>
                     <div class="chart-wrapper">
                         <canvas id="openmath-gpt-latency-chart"></canvas>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Multi-Model Comparison -->
                 <div class="chart-container">
