@@ -1033,7 +1033,7 @@ trtllm-bench \
                             </li>
                         </ul>
 
-                        <div style="background: rgba(245, 158, 11, 0.15); border-left: 4px solid #f59e0b; padding: 18px; border-radius: 8px; margin-top: 25px;">
+                        <!-- <div style="background: rgba(245, 158, 11, 0.15); border-left: 4px solid #f59e0b; padding: 18px; border-radius: 8px; margin-top: 25px;">
                             <p style="color: #fbbf24; font-weight: 600; margin-bottom: 8px; font-size: 1.05rem;">
                                 📊 Interpreting the Results
                             </p>
@@ -1046,7 +1046,7 @@ trtllm-bench \
                                 <strong style="color: #fbbf24;">8.6%</strong> on openMath (29,757 vs 32,565 tok/s/gpu),
                                 relative to the hardware's theoretical peak under perfect load distribution.
                             </p>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
         </div>
@@ -1663,70 +1663,29 @@ trtllm-bench \
                     </h2>
                     
                     <p style="color: #cbd5e1; margin-bottom: 25px; font-size: 1.05rem; line-height: 1.7;">
-                        Our benchmark reveals a counter-intuitive phenomenon: <strong>Per-GPU throughput rises linearly</strong> from 1 to 4 GPUs, implying a super-linear total speedup. However, this trend abruptly reverses at 8 GPUs. This behavior marks the transition between two distinct physical regimes: the <strong>Memory-Bound Regime</strong> and the <strong>Latency-Bound Regime</strong>.
+                        Our benchmark reveals a counter-intuitive phenomenon: <strong>Per-GPU throughput rises linearly</strong> from 1 to 4 GPUs, implying a super-linear total speedup. However, this trend abruptly reverses at 8 GPUs. This behavior marks the transition between two distinct regimes: the <strong>Memory-Bound Regime</strong> and the <strong>Latency-Bound Regime</strong>.
                     </p>
-
-                    <div class="math-block" style="border-left-color: #60a5fa;">
-                        <p style="color: #e2e8f0; margin-bottom: 10px; font-weight: 600;">Notation and Setup</p>
-                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">
-                            We use the following notation to model the scaling behavior:
-                        </p>
-                        <ul style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.6; padding-left: 20px; margin-bottom: 15px;">
-                            <li style="margin-bottom: 6px;"><strong>\(N\):</strong> Number of GPUs participating in expert parallelism (EP group size, e.g., \(N \in \{1,2,4,8\}\)).</li>
-                            <li style="margin-bottom: 6px;"><strong>\(\text{Batch}_{\text{gpu}}\):</strong> Effective batch size <strong>per GPU</strong> during decode (number of active sequences; in our random dataset benchmark this is fixed to 640 per GPU, so global batch is \(N \times 640\)).</li>
-                            <li style="margin-bottom: 6px;"><strong>\(Q_{\text{gpu}}(N)\):</strong> Per-GPU output throughput, measured as \(\frac{\text{total new tokens generated}}{N \times \text{total decode time}}\).</li>
-                            <li style="margin-bottom: 6px;"><strong>\(T(N)\):</strong> End-to-end <strong>decode step</strong> latency with \(N\) GPUs (dominated by the generation phase for our 2k-token outputs).</li>
-                            <li style="margin-bottom: 6px;"><strong>\(T_{\text{mem}}(1)\):</strong> The memory-bound part of the step latency on a <strong>single</strong> GPU (time spent waiting on HBM / weight loads).</li>
-                            <li style="margin-bottom: 6px;"><strong>\(T_{\text{overhead}}\):</strong> Launch and framework overheads that are essentially independent of \(N\) (kernel launches, scheduling, host-device sync, etc.).</li>
-                            <li style="margin-bottom: 6px;"><strong>\(T_{\text{comm}}(N)\):</strong> Communication latency introduced by MoE all-to-all and related collectives when we scale \(N\).</li>
-                        </ul>
-                        
-                        <p style="color: #e2e8f0; margin-bottom: 10px; font-weight: 600;">1. The Throughput-Latency Inverse Relationship</p>
-                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">
-                            In a weak scaling setup (fixed batch size \(B\) per GPU), the Per-GPU Throughput \(Q(N)\) is strictly governed by the end-to-end step latency \(T(N)\):
-                        </p>
-                        $$ Q_{\text{gpu}}(N) = \frac{\text{Batch}_{\text{gpu}}}{T(N)} \propto \frac{1}{T(N)} $$
-                        
-                        <p style="color: #e2e8f0; margin-top: 20px; margin-bottom: 10px; font-weight: 600;">2. Latency Decomposition (Amdahl's Law Extended)</p>
-                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">
-                            The single-step latency \(T(N)\) can then be decomposed as:
-                        </p>
-                        $$ T(N) \approx \underbrace{\frac{T_{\text{mem}}(1)}{N}}_{\text{Gain: aggregate HBM bandwidth}} + \underbrace{T_{\text{overhead}}}_{\text{Fixed: launch / runtime}} + \underbrace{T_{\text{comm}}(N)}_{\text{Loss: MoE all-to-all}} $$
-                    </div>
 
                     <div class="regime-grid">
                         <div class="regime-card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%);">
                             <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
-                            <ul style="padding-left: 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
-                                <li style="margin-bottom: 8px;"><strong>Mechanism:</strong> GPT-OSS-120B is too large for a single GPU's HBM bandwidth. Inference is stall-bound waiting for weights.</li>
-                                <li style="margin-bottom: 8px;"><strong>Scaling:</strong> As \(N\) increases, we aggregate HBM bandwidth. The memory term \(\frac{T_{\text{mem}}(1)}{N}\) dominates the equation.</li>
-                                <li style="margin-bottom: 8px;"><strong>Result:</strong> Latency drops linearly (\(T \downarrow\)), causing Throughput to rise linearly (\(Q \uparrow\)).</li>
-                                <li style="margin-bottom: 8px;"><strong>Observed in Benchmark:</strong> In our random-dataset benchmark we keep \(\text{Batch}_{\text{gpu}}\) fixed (640 sequences per GPU), so any increase in \(Q_{\text{gpu}}(N)\) from 1 → 4 GPUs comes purely from reducing \(T(N)\) via aggregate HBM bandwidth.</li>
-                            </ul>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
+                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token. In our benchmark we keep the work per GPU fixed (640 active sequences per GPU), so the only thing that really changes is <strong>how quickly each GPU can finish a decode step</strong>.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
+                                At 1 GPU the step is dominated by waiting for weights to arrive from memory; as we add more GPUs, we effectively <strong>aggregate HBM bandwidth</strong> and chip away at that memory stall. The step latency per GPU goes down almost in proportion to the number of GPUs, so per-GPU throughput climbs nearly linearly from 1 → 4. Total cluster throughput even looks super-linear, because you have more GPUs and each GPU is also running faster.
+                            </p>
                         </div>
 
                         <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
                             <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
-                            <ul style="padding-left: 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
-                                <li style="margin-bottom: 8px;"><strong>The Inflection Point:</strong> At 8 GPUs, the memory access time is already minimal (diminishing returns).</li>
-                                <li style="margin-bottom: 8px;"><strong>Small Message Penalty:</strong> MoE EP requires All-to-All. As \(N\) grows, the message size per peer (\(\text{Batch}/N\)) shrinks. NVLink bandwidth utilization drops for small messages, making the system <strong>Latency-Bound</strong>.</li>
-                                <li style="margin-bottom: 8px;"><strong>Result:</strong> \(T_{\text{comm}}(N)\) rises faster than \(T_{\text{mem}}(1)\) falls. Total Latency increases, Throughput drops.</li>
-                                <li style="margin-bottom: 8px;"><strong>Observed in Benchmark:</strong> The drop at 8 GPUs reflects \(T_{\text{comm}}(N)\) starting to dominate, turning the curve from linear growth to performance degradation.</li>
-                            </ul>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
+                                This nice trend breaks at 8 GPUs. By that point, the memory wait time is already very small, so further slicing the model does not help much. Instead, <strong>two new effects start to dominate</strong>.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
+                                The learned router no longer keeps the load perfectly balanced: some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.
+                            </p>
                         </div>
-                    </div>
-
-                    <div style="margin-top: 30px; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 8px; border: 1px dashed #5E5CE6;">
-                        <h4 style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 10px;">� The Drop Condition (Mathematical Criterion)</h4>
-                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">
-                            Performance degrades when the cost of coordination exceeds the benefit of parallelization:
-                        </p>
-                        <div style="font-family: 'Monaco', monospace; color: #e2e8f0; text-align: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;">
-                            $$ |\Delta T_{\text{comm\_overhead}}| > |\Delta T_{\text{compute\_gain}}| $$
-                        </div>
-                        <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 10px;">
-                            This typically occurs when the kernel execution time drops below the <strong>Kernel Launch Latency (~3-5μs)</strong> or when interconnect latency dominates due to fragmented packets.
-                        </p>
                     </div>
 
                     <div class="callout-note">
@@ -1734,9 +1693,6 @@ trtllm-bench \
                         <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6;">
                             This analysis focuses on the <strong>Decode Phase (Generation)</strong>, which dominates our 2k-output workload (>99% of runtime). Decode is inherently memory/latency-bound.
                         </p>
-                        <!-- <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-top: 8px;">
-                            <strong>Prefill (TTFT)</strong> is typically compute-bound. In scenarios with short output lengths (e.g., RAG), the scaling curve would look flatter, as the "Memory Wall Breakout" effect is less pronounced during the compute-heavy prefill phase.
-                        </p> -->
                     </div>
                 </div>
                 
