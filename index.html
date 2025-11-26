@@ -789,6 +789,12 @@
     <div class="container">
         <header>
             <h1>MoE at Scale on B200 GPUs: Expert Load Balance, and Backend Performance</h1>
+            <p style="color:#cbd5e1; max-width: 800px; margin: 20px auto 0; font-size: 1.1rem; line-height: 1.8;">
+                In this post, we answer a concrete question: <strong>what limits MoE throughput on GPU B200</strong>—the hardware, the backend (CUTLASS vs. TRT-LLM), or the router's load imbalance?
+            </p>
+            <p style="color:#9ca3af; max-width: 800px; margin: 10px auto 0; font-size: 1rem; line-height: 1.6;">
+                We benchmark GPT-OSS-120B across three datasets (Random, ShareGPT, openMath), sweeping TP/EP configurations to compare the "<strong>Ideal</strong>" Round Robin router against the "<strong>Actual</strong>" real router. Our goal: turn benchmark numbers into <strong>actionable insights for scaling MoE</strong>.
+            </p>
         </header>
 
         <div class="gpu-comparison-section">
@@ -1063,6 +1069,17 @@ trtllm-bench \
             </div>
         </div>
 
+        <!-- Transition: Methodology -> Datasets -->
+        <div style="max-width: 900px; margin: 40px auto 20px auto; text-align: center;">
+            <h2 style="font-size: 1.8rem; background: linear-gradient(135deg, #fff 0%, #94a3b8 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px;">
+                Benchmark Results: Impact of Workload Variance
+            </h2>
+            <p style="color: #cbd5e1; font-size: 1rem; line-height: 1.8;">
+                With the baseline established, we analyze behavior across three representative workloads:
+                <strong>Random</strong> (wide-decode stress test), <strong>ShareGPT</strong> (chat traffic), and <strong>openMath</strong> (math reasoning).
+            </p>
+        </div>
+
         <!-- Dataset Tabs -->
         <div class="dataset-tabs">
             <button class="tab-button active" onclick="switchDataset('random')">
@@ -1315,7 +1332,7 @@ trtllm-bench \
 
                 <!-- Round Robin Impact Chart -->
                 <div class="chart-container">
-                    <h3>Round Robin Impact on Throughput</h3>
+                    <h3>Throughput Gap: Learned Router vs. Ideal Round Robin</h3>
                     <div class="chart-wrapper">
                         <canvas id="sharegpt-perfect-router-chart"></canvas>
                     </div>
@@ -1438,17 +1455,6 @@ trtllm-bench \
                             </tr>
                         </tbody>
                     </table>
-
-                    <div style="margin-top: 30px; padding: 20px; background: rgba(94,92,230,0.05); border-radius: 12px; border-left: 4px solid #5E5CE6;">
-                        <h4 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.1rem;">💡 Key Observations</h4>
-                        <ul style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
-                            <li><strong>GPT-OSS-120B dominates</strong> with 23,702 tok/s/gpu (Round Robin), achieving 7.7x throughput vs DeepSeek-V3</li>
-                            <li><strong>DeepSeek models show consistency</strong>: DeepSeek-R1 and V3 achieve similar performance (~3,061-3,111 tok/s/gpu with Round Robin)</li>
-                            <li><strong>Round Robin provides 5-13% boost</strong>: Most significant gap seen in DeepSeek-V3 (12.9% at 8 GPUs)</li>
-                            <li><strong>GPU count matters</strong>: DeepSeek-V3 achieves higher per-GPU throughput with 7 GPUs (3,409) vs 8 GPUs (3,061), suggesting potential load balancing issues</li>
-                            <li><strong>Quantization impact</strong>: W4A8 quantization (GPT-OSS) shows significantly better performance than FP8_BLOCK_SCALES (DeepSeek)</li>
-                        </ul>
-                    </div>
                 </div>
 
                 <!-- <h2 style="margin-top: 60px;">GPT-OSS-120B: Detailed Analysis</h2>
@@ -1633,30 +1639,6 @@ trtllm-bench \
 
         <!-- Random Dataset Content -->
     <div id="random-content" class="dataset-content active">
-            <!-- Hero Results for Random Dataset -->
-            <!-- <div class="hero-results">
-                <div class="result-card">
-                    <h3>📊 Random Dataset</h3>
-
-                    <div class="result-metric">
-                    <span class="metric-label">Input Tokens</span>
-                    <span class="metric-value">1024 (fixed)</span>
-                    </div>
-                    <div class="result-metric">
-                    <span class="metric-label">Output Tokens</span>
-                    <span class="metric-value">2048 (fixed)</span>
-                    </div>
-                    <div class="result-metric">
-                    <span class="metric-label">Requests</span>
-                    <span class="metric-value">20,000</span>
-                    </div>
-                    <div class="result-metric">
-                    <span class="metric-label">Tokenizer</span>
-                    <span class="metric-value">openai/gpt-oss-120b</span>
-                    </div>
-                </div>
-            </div> -->
-
 
             <!-- Random Dataset Charts -->
             <div class="section">
@@ -1679,7 +1661,7 @@ trtllm-bench \
                 <!-- Theoretical Analysis Section -->
                 <div class="analysis-container">
                     <h2 style="color: #60a5fa; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                        Theoretical Analysis: The Physics of Linear Scaling
+                        Analysis: Linear Scaling increase of the per gpu throughput
                     </h2>
                     
                     <p style="color: #cbd5e1; margin-bottom: 25px; font-size: 1.05rem; line-height: 1.7;">
@@ -1738,9 +1720,9 @@ trtllm-bench \
                         <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6;">
                             This analysis focuses on the <strong>Decode Phase (Generation)</strong>, which dominates our 2k-output workload (>99% of runtime). Decode is inherently memory/latency-bound.
                         </p>
-                        <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-top: 8px;">
+                        <!-- <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-top: 8px;">
                             <strong>Prefill (TTFT)</strong> is typically compute-bound. In scenarios with short output lengths (e.g., RAG), the scaling curve would look flatter, as the "Memory Wall Breakout" effect is less pronounced during the compute-heavy prefill phase.
-                        </p>
+                        </p> -->
                     </div>
                 </div>
                 
@@ -2009,7 +1991,7 @@ trtllm-bench \
                         </div>
 
                         <div class="chart-container">
-                            <h3>Round Robin Impact on Throughput</h3>
+                            <h3>Throughput Gap: Learned Router vs. Ideal Round Robin</h3>
                             <div class="chart-wrapper">
                                 <canvas id="random-8gpu-perfect-router-chart"></canvas>
                             </div>
@@ -2129,16 +2111,16 @@ trtllm-bench \
                             </table>
                         </div>
 
-                        <div style="margin-top: 30px; padding: 20px; background: rgba(94,92,230,0.08); border-radius: 12px; border-left: 4px solid #5E5CE6;">
+                        <!-- <div style="margin-top: 30px; padding: 20px; background: rgba(94,92,230,0.08); border-radius: 12px; border-left: 4px solid #5E5CE6;">
                             <h4 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.1rem;">💡 Key Observations</h4>
                             <ul style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
                                 <li><strong>GPT-OSS-120B dominates</strong>: Achieves 7.5x higher throughput than DeepSeek models with W4A8 quantization</li>
                                 <li><strong>CUTLASS vs TRT-LLM</strong>: CUTLASS shows significant advantage for GPT-OSS-120B (+31.9%), but minimal difference for Qwen3 (+1.6%)</li>
                                 <li><strong>Model size impact</strong>: Larger models (DeepSeek 671B, Qwen 235B) show dramatically lower per-GPU throughput vs GPT-OSS-120B (120B)</li>
-                                <li><strong>Round Robin benefits</strong>: All models gap 11-20% throughput improvement with Round Robin, with DeepSeek-R1 showing highest gap (+20.1%)</li>
+                                <li><strong>Quantified Efficiency Gap</strong>: Comparing against Round Robin reveals a <strong>11-20% throughput gap</strong> for learned routers relative to ideal load balance, with DeepSeek-R1 showing the largest deficit (20.1%)</li>
                                 <li><strong>DeepGeMM backend</strong>: Required for ultra-large models (DeepSeek), performs comparably to CUTLASS/TRT-LLM for similar-sized models</li>
                             </ul>
-                        </div>
+                        </div> -->
 
                         <!-- MoE Expert Load Balance Heatmap -->
                         <div style="margin-top: 40px;">
@@ -2240,7 +2222,7 @@ trtllm-bench \
 
                 <!-- openMath Round Robin Impact Chart -->
                 <div class="chart-container">
-                    <h3>Round Robin Impact on Throughput (8 GPUs)</h3>
+                    <h3>Throughput Gap: Learned Router vs. Ideal Round Robin (8 GPUs)</h3>
                     <div class="chart-wrapper">
                         <canvas id="openmath-gap-chart"></canvas>
                     </div>
@@ -2517,18 +2499,6 @@ trtllm-bench \
                         </tbody>
                     </table> -->
 
-                    <div style="margin-top: 30px; padding: 20px; background: rgba(94,92,230,0.08); border-radius: 12px; border-left: 4px solid #5E5CE6;">
-                        <h4 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.1rem;">💡 Key Observations (openMath Dataset)</h4>
-                        <ul style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
-                            <li><strong>GPT-OSS-120B achieves exceptional performance</strong>: 32,565 tok/s/gpu at 8 GPUs with Round Robin - 6.3x higher than DeepSeek models despite longer output sequence (8192 vs 2048 tokens)</li>
-                            <li><strong>Longer output sequences boost throughput</strong>: GPT-OSS shows 40-68% higher per-GPU throughput with 8k outputs vs 2k outputs on Random/ShareGPT datasets, demonstrating memory-bound decode efficiency</li>
-                            <li><strong>Round Robin shows consistent 6-11% gap</strong>: All models benefit from perfect routing, with TRT-LLM showing slightly higher improvement (10-11%) vs CUTLASS (6-9%)</li>
-                            <li><strong>CUTLASS maintains advantage</strong>: For GPT-OSS-120B, CUTLASS outperforms TRT-LLM by 30-45% across all GPU counts, confirming backend superiority for this model</li>
-                            <li><strong>Scaling efficiency improves with load</strong>: Unlike 2k-output workloads that peak at 4 GPUs, the 8k-output math workload shows continued throughput growth to 8 GPUs (32,565 tok/s/gpu), suggesting better amortization of communication overhead with longer decode phases</li>
-                            <li><strong>DeepSeek and Qwen show parity</strong>: All three large models (DeepSeek-V3, DeepSeek-R1, Qwen3-235B) achieve similar ~5k tok/s/gpu with Round Robin, indicating model size is the primary bottleneck</li>
-                        </ul>
-                    </div>
-
                     <!-- MoE Expert Load Balance Heatmap -->
                     <div style="margin-top: 40px;">
                         <h3 style="color: #60a5fa; margin-bottom: 20px; font-size: 1.5rem;">MoE Expert Load Balance Analysis</h3>
@@ -2548,18 +2518,20 @@ trtllm-bench \
             <h2>Insights</h2>
             <div class="insights-grid">
                 <div class="insight-card">
-                    <h3>📊 Conclusion</h3>
-                    
+
                     <div class="conclusion-intro">
-                        <p>As the <strong>number of GPUs</strong> and <strong>EP size</strong> increase, the <strong>MoE load‑balancing problem becomes more severe</strong>.</p>
+                        <p>
+                            Putting the B200 benchmarks together, we isolate three factors: 
+                            <strong>(1) Raw GPU Capability</strong>, <strong>(2) Backend Efficiency</strong>, and <strong>(3) Expert Imbalance</strong>. 
+                            Data shows that on B200, <strong>the expert load imbalance dominate the efficiency gap</strong>, far more than the GEMM kernels themselves.
+                        </p>
                     </div>
                     
                     <div class="insight-section-group">
-                        <h4 class="insight-subsection-title">📈 Performance Degradation</h4>
+                        <h4 class="insight-subsection-title">✅ What works well on B200</h4>
                         <ul class="insight-list">
-                            <li><strong>Throughput gap grows</strong> with scale — on GSM8K the gap widens from ~2–3% at EP=4 to ~8–11% at EP=8</li>
-                            <li><strong>Latency gap also increases</strong> — from ~1.5–3.2% at EP=2–4 to ~8–12% at EP=8</li>
-                            <li>Primary contributors: heavier all‑to‑all traffic, router skew, and per‑expert queuing/overflow</li>
+                            <li><strong>CUTLASS + Open EP:</strong> Consistently delivers the best throughput for GPT-OSS-120B, outperforming TRT-LLM by ~30% in our tests.</li>
+                            <li><strong>Linear Scaling (1→4 GPUs):</strong> The system stays in the "Memory-Wall Breakout" regime. Aggregating HBM and NVLink yields near-linear per-GPU gains.</li>
                         </ul>
                     </div>
                     
@@ -2924,14 +2896,14 @@ trtllm-bench \
             const sharegptPerfectRouterCtx = document.getElementById('sharegpt-perfect-router-chart');
             if (sharegptPerfectRouterCtx) {
                 const perfectRouterOptions = JSON.parse(JSON.stringify(commonOptions));
-                perfectRouterOptions.scales.y.title.text = 'Throughput Improvement (%)';
+                perfectRouterOptions.scales.y.title.text = 'Throughput Gap to Ideal (%)';
                 
                 new Chart(sharegptPerfectRouterCtx, {
                     type: 'bar',
                     data: {
                         labels: ['GPT-OSS\nCUTLASS', 'GPT-OSS\nTRT-LLM', 'DeepSeek-V3\n(8 GPU)', 'DeepSeek-V3\n(7 GPU)', 'DeepSeek-R1', 'Qwen3-235B'],
                         datasets: [{
-                            label: 'Performance Gap (%)',
+                            label: 'Performance Gap (vs. Ideal Round Robin)',
                             data: [
                                 ((23702 - 22051) / 22051 * 100).toFixed(1),  // GPT CUTLASS: 7.5%
                                 ((17739 - 16425) / 16425 * 100).toFixed(1),  // GPT TRT-LLM: 8.0%
@@ -3523,14 +3495,14 @@ trtllm-bench \
             const random8GpuPerfectRouterCtx = document.getElementById('random-8gpu-perfect-router-chart');
             if (random8GpuPerfectRouterCtx) {
                 const perfectRouterOptions = JSON.parse(JSON.stringify(commonOptions));
-                perfectRouterOptions.scales.y.title.text = 'Performance Improvement (%)';
+                perfectRouterOptions.scales.y.title.text = 'Throughput Gap to Ideal (%)';
                 
                 new Chart(random8GpuPerfectRouterCtx, {
                     type: 'bar',
                     data: {
                         labels: ['GPT-OSS\nCUTLASS', 'GPT-OSS\nTRT-LLM', 'Qwen3\nCUTLASS', 'Qwen3\nTRT-LLM', 'DeepSeek-V3\nDeepGeMM', 'DeepSeek-R1\nDeepGeMM'],
                         datasets: [{
-                            label: 'Throughput Gap with Round Robin (%)',
+                            label: 'Performance Gap (vs. Ideal Round Robin)',
                             data: [
                                 ((23696 - 19355) / 19355 * 100).toFixed(1),  // GPT CUTLASS: +22.4%
                                 ((17665 - 14678) / 14678 * 100).toFixed(1),  // GPT TRT-LLM: +20.3%
@@ -3784,14 +3756,14 @@ trtllm-bench \
             const openmathGapCtx = document.getElementById('openmath-gap-chart');
             if (openmathGapCtx) {
                 const gapOptions = JSON.parse(JSON.stringify(commonOptions));
-                gapOptions.scales.y.title.text = 'Performance Improvement (%)';
+                gapOptions.scales.y.title.text = 'Throughput Gap to Ideal (%)';
 
                 new Chart(openmathGapCtx, {
                     type: 'bar',
                     data: {
                         labels: ['GPT-OSS\nCUTLASS', 'GPT-OSS\nTRT-LLM', 'DeepSeek-V3\nDeepGeMM', 'DeepSeek-R1\nDeepGeMM', 'Qwen3-235B\nCUTLASS', 'Qwen3-235B\nTRT-LLM'],
                         datasets: [{
-                            label: 'Throughput Gap with Round Robin (%)',
+                            label: 'Performance Gap (vs. Ideal Round Robin)',
                             data: [
                                 ((32565 - 29757) / 29757 * 100).toFixed(1),   // GPT-OSS CUTLASS: +9.4%
                                 ((24967 - 22467) / 22467 * 100).toFixed(1),   // GPT-OSS TRT-LLM: +11.1%
