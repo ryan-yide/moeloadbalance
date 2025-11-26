@@ -879,7 +879,7 @@
                     <div class="command-section" style="margin-top: 0; margin-bottom: 32px;">
                         <div class="section-header" onclick="toggleSection(this)" style="cursor: pointer;">
                             <div class="toggle-icon collapsed">▶</div>
-                            <h2 style="color: #60a5fa;">Complete Benchmark Script (4 GPUs, Random Dataset)</h2>
+                            <h2 style="color: #60a5fa;">Complete Benchmark Script</h2>
                         </div>
                         <div class="section-content collapsed">
                             <div class="code-block">
@@ -1066,22 +1066,22 @@ trtllm-bench \
         <!-- Dataset Tabs -->
         <div class="dataset-tabs">
             <button class="tab-button active" onclick="switchDataset('random')">
-                Random Dataset
+                Random Dataset(1k/2k)
             </button>
             <!-- <button class="tab-button" onclick="switchDataset('gsm8k')">
                 GSM8K Dataset
             </button> -->
             <button class="tab-button" onclick="switchDataset('sharegpt')">
-                ShareGPT Dataset
+                OpenGVLab/ShareGPT-4o
             </button>
             <button class="tab-button" onclick="switchDataset('openmath')">
-                openMath Dataset
+                nvidia/OpenMathInstruct-1
             </button>
         </div>
 
         <!-- GSM8K Dataset Content -->
-    <!-- GSM8K Dataset Content -->
-    <div id="gsm8k-content" class="dataset-content">
+        <!-- GSM8K Dataset Content -->
+        <div id="gsm8k-content" class="dataset-content">
             <!-- Hero Results for GSM8K -->
             <div class="hero-results">
                 <div class="result-card winner">
@@ -1626,7 +1626,7 @@ trtllm-bench \
         <!-- Random Dataset Content -->
     <div id="random-content" class="dataset-content active">
             <!-- Hero Results for Random Dataset -->
-            <div class="hero-results">
+            <!-- <div class="hero-results">
                 <div class="result-card">
                     <h3>📊 Random Dataset</h3>
 
@@ -1647,7 +1647,7 @@ trtllm-bench \
                     <span class="metric-value">openai/gpt-oss-120b</span>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
 
             <!-- Random Dataset Charts -->
@@ -2150,7 +2150,7 @@ trtllm-bench \
         <!-- openMath Dataset Content -->
         <div id="openmath-content" class="dataset-content">
             <!-- Hero Results for openMath Dataset -->
-            <div class="hero-results">
+            <!-- <div class="hero-results">
                 <div class="result-card winner">
                     <h3>
                         nvidia/openMath Dataset
@@ -2200,7 +2200,7 @@ trtllm-bench \
                         <span class="metric-value" style="color: #10b981;">+7.2% with Round Robin</span>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- openMath Charts and Analysis -->
             <div class="section">
