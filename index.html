@@ -151,7 +151,7 @@
         }
         
         .section-content {
-            max-height: 2000px;
+            max-height: 4000px;
             overflow: hidden;
             transition: all 0.3s ease;
             margin-top: 20px;
@@ -875,6 +875,51 @@
                         <p style="color: #8E8E93; margin-top: 10px;">Set this environment variable before running your MoE backend to enable perfect routing for benchmarking.</p>
                     </div>
 
+                    <!-- Complete Benchmark Command -->
+                    <div class="command-section" style="margin-top: 0; margin-bottom: 32px;">
+                        <div class="section-header" onclick="toggleSection(this)" style="cursor: pointer;">
+                            <div class="toggle-icon collapsed">▶</div>
+                            <h2 style="color: #60a5fa;">Complete Benchmark Script (4 GPUs, Random Dataset)</h2>
+                        </div>
+                        <div class="section-content collapsed">
+                            <div class="code-block">
+                                <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
+                                <code>num_gpus=4
+max_batch_size=640
+
+cat &lt;&lt;EOF &gt; max_throughput.yaml
+enable_attention_dp: true
+cuda_graph_config:
+    max_batch_size: ${max_batch_size}
+    enable_padding: true
+stream_interval: 10
+moe_config:
+    backend: CUTLASS
+EOF
+
+trtllm-bench \
+    --model openai/gpt-oss-120b \
+    throughput \
+    --backend pytorch \
+    --tp ${num_gpus} \
+    --ep ${num_gpus} \
+    --extra_llm_api_options max_throughput.yaml \
+    --dataset gpt-oss-120b-1k2k.txt \
+    --max_batch_size ${max_batch_size} \
+    --concurrency $((max_batch_size * num_gpus)) \
+    --num_requests $((max_batch_size * num_gpus * 3)) \
+    --kv_cache_free_gpu_mem_fraction 0.9 \
+    --streaming \
+    --warmup 0 \
+    --report_json max_throughput_benchmark.json</code>
+                            </div>
+                            <p style="color: #8E8E93; margin-top: 10px;">
+                                Full benchmark command for running max throughput test on GPT-OSS-120B with 4 GPUs, using CUTLASS backend and Random Dataset (1k input/2k output).
+                                Adjust <code style="background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 2px 6px; border-radius: 4px;">num_gpus</code> for different configurations (2, 4, or 8).
+                            </p>
+                        </div>
+                    </div>
+
                     <!-- Methodology Section -->
                     <div style="background: rgba(30, 30, 35, 0.8); border: 1px solid rgba(94, 92, 230, 0.3); border-radius: 12px; padding: 30px; margin-top: 30px; backdrop-filter: blur(10px);">
                         <h2 style="color: #60a5fa; margin-bottom: 20px; font-size: 1.5rem;">
@@ -1182,7 +1227,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>GPUs</th>   
+                                <th>GPUs</th> 
                                 <th>EP Size</th>
                                 <th>MoE Backend</th>
                                 <th>Ideal Total Latency(s)</th>
