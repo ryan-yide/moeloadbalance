@@ -789,11 +789,9 @@
     <div class="container">
         <header>
             <h1>MoE at Scale on B200 GPUs: Expert Load Balance, and Backend Performance</h1>
-            <p style="color:#cbd5e1; max-width: 800px; margin: 20px auto 0; font-size: 1.1rem; line-height: 1.8;">
-                In this post, we answer a concrete question: <strong>what limits MoE throughput on GPU B200</strong>—the hardware, the backend (CUTLASS vs. TRT-LLM), or the router's load imbalance?
-            </p>
-            <p style="color:#9ca3af; max-width: 800px; margin: 10px auto 0; font-size: 1rem; line-height: 1.6;">
-                We benchmark GPT-OSS-120B across three datasets (Random, ShareGPT, openMath), sweeping TP/EP configurations to compare the "<strong>Ideal</strong>" Round Robin router against the "<strong>Actual</strong>" real router. Our goal: turn benchmark numbers into <strong>actionable insights for scaling MoE</strong>.
+            <p style="color:#cbd5e1; max-width: 850px; margin: 20px auto 0; font-size: 1.05rem; line-height: 1.7;">
+                This post presents a deep-dive analysis of <strong>Sparse MoE Inference on NVIDIA B200</strong>, isolating two critical performance drivers: 
+                <strong>(1) MoE Backend</strong> (CUTLASS vs. TensorRT-LLM) and <strong>(2) Load Balance</strong> (Real Router vs Round Robin). By benchmarking <strong>GPT-OSS-120B, DeepSeek-R1, DeepSeek-V3, Qwen3-235B-A22B</strong> across varying scales (TP/EP), we quantify how backend choice impacts kernel execution and how expert load imbalance creates an "Efficiency Gap" on the B200 hardware architecture.
             </p>
         </header>
 
@@ -2528,7 +2526,7 @@ trtllm-bench \
                     </div>
                     
                     <div class="insight-section-group">
-                        <h4 class="insight-subsection-title">✅ What works well on B200</h4>
+                        <h4 class="insight-subsection-title">What works well on B200</h4>
                         <ul class="insight-list">
                             <li><strong>CUTLASS + Open EP:</strong> Consistently delivers the best throughput for GPT-OSS-120B, outperforming TRT-LLM by ~30% in our tests.</li>
                             <li><strong>Linear Scaling (1→4 GPUs):</strong> The system stays in the "Memory-Wall Breakout" regime. Aggregating HBM and NVLink yields near-linear per-GPU gains.</li>
