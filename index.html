@@ -1378,7 +1378,7 @@ trtllm-bench \
                 </div>
 
                 <!-- Model Comparison Table -->
-                <div style="overflow-x: auto; margin-top: 30px;">
+                <!-- <div style="overflow-x: auto; margin-top: 30px;">
                     <h3>Model Performance Comparison (ShareGPT Dataset)</h3>
                     <table>
                         <thead>
@@ -1388,18 +1388,15 @@ trtllm-bench \
                                 <th>MoE Backend</th>
                                 <th>Router Type</th>
                                 <th>Output Throughput (tok/s/gpu)</th>
-                                <!-- <th>Quantization</th> -->
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- GPT-OSS-120B -->
                             <tr class="highlight">
                                 <td><strong>GPT-OSS-120B</strong></td>
                                 <td><strong>8</strong></td>
                                 <td><strong>CUTLASS</strong></td>
                                 <td><strong>Round Robin</strong></td>
                                 <td class="perf-good"><strong>23,702</strong></td>
-                                <!-- <td>W4A8_MXFP4_MXFP8</td> -->
                             </tr>
                             <tr>
                                 <td>GPT-OSS-120B</td>
@@ -1407,7 +1404,6 @@ trtllm-bench \
                                 <td>CUTLASS</td>
                                 <td>Default</td>
                                 <td>22,051</td>
-                                <!-- <td>W4A8_MXFP4_MXFP8</td> -->
                             </tr>
                             <tr>
                                 <td>GPT-OSS-120B</td>
@@ -1415,7 +1411,6 @@ trtllm-bench \
                                 <td>TRT-LLM</td>
                                 <td>Round Robin</td>
                                 <td>17,739</td>
-                                <!-- <td>W4A8_MXFP4_MXFP8</td> -->
                             </tr>
                             <tr>
                                 <td>GPT-OSS-120B</td>
@@ -1423,16 +1418,13 @@ trtllm-bench \
                                 <td>TRT-LLM</td>
                                 <td>Default</td>
                                 <td>16,425</td>
-                                <!-- <td>W4A8_MXFP4_MXFP8</td> -->
                             </tr>
-                            <!-- DeepSeek-V3 -->
                             <tr class="highlight">
                                 <td><strong>DeepSeek-V3</strong></td>
                                 <td><strong>8</strong></td>
                                 <td><strong>DeepGeMM</strong></td>
                                 <td><strong>Round Robin</strong></td>
                                 <td class="perf-good"><strong>3,061</strong></td>
-                                <!-- <td>FP8_BLOCK_SCALES</td> -->
                             </tr>
                             <tr>
                                 <td>DeepSeek-V3</td>
@@ -1440,7 +1432,6 @@ trtllm-bench \
                                 <td>DeepGeMM</td>
                                 <td>Default</td>
                                 <td>2,712</td>
-                                <!-- <td>FP8_BLOCK_SCALES</td> -->
                             </tr>
                             <tr>
                                 <td>DeepSeek-V3</td>
@@ -1448,7 +1439,6 @@ trtllm-bench \
                                 <td>DeepGeMM</td>
                                 <td>Round Robin</td>
                                 <td>3,409</td>
-                                <!-- <td>FP8_BLOCK_SCALES</td> -->
                             </tr>
                             <tr>
                                 <td>DeepSeek-V3</td>
@@ -1456,16 +1446,13 @@ trtllm-bench \
                                 <td>DeepGeMM</td>
                                 <td>Default</td>
                                 <td>3,178</td>
-                                <!-- <td>FP8_BLOCK_SCALES</td> -->
                             </tr>
-                            <!-- DeepSeek-R1 -->
                             <tr class="highlight">
                                 <td><strong>DeepSeek-R1</strong></td>
                                 <td><strong>8</strong></td>
                                 <td><strong>DeepGeMM</strong></td>
                                 <td><strong>Round Robin</strong></td>
                                 <td class="perf-good"><strong>3,111</strong></td>
-                                <!-- <td>FP8_BLOCK_SCALES</td> -->
                             </tr>
                             <tr>
                                 <td>DeepSeek-R1</td>
@@ -1473,16 +1460,13 @@ trtllm-bench \
                                 <td>DeepGeMM</td>
                                 <td>Default</td>
                                 <td>2,854</td>
-                                <!-- <td>FP8_BLOCK_SCALES</td> -->
                             </tr>
-                            <!-- Qwen3-235B -->
                             <tr class="highlight">
                                 <td><strong>Qwen3-235B-A22B</strong></td>
                                 <td><strong>8</strong></td>
                                 <td><strong>CUTLASS</strong></td>
                                 <td><strong>Round Robin</strong></td>
                                 <td class="perf-neutral"><strong>1,426</strong></td>
-                                <!-- <td>NA</td> -->
                             </tr>
                             <tr>
                                 <td>Qwen3-235B-A22B</td>
@@ -1490,11 +1474,10 @@ trtllm-bench \
                                 <td>CUTLASS</td>
                                 <td>Default</td>
                                 <td>1,358</td>
-                                <!-- <td>NA</td> -->
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div> -->
 
                 <!-- <h2 style="margin-top: 60px;">GPT-OSS-120B: Detailed Analysis</h2>
                 
@@ -1593,7 +1576,7 @@ trtllm-bench \
                         </tbody>
                     </table>
 
-                    <h3>Total Latency Performance (ShareGPT Dataset)</h3>
+                    <!-- <h3>Total Latency Performance (ShareGPT Dataset)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -1671,7 +1654,7 @@ trtllm-bench \
                                 <td class="perf-bad">+8.01%</td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table> -->
                 </div>
             </div>
         </div>
@@ -1739,7 +1722,7 @@ trtllm-bench \
                 
                 <!-- Detailed Performance Table -->
                 <div style="overflow-x: auto; margin-top: 30px;">
-                    <h3>Throughput Performance (Random Dataset)</h3>
+                    <!-- <h3>Throughput Performance (Random Dataset)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -1817,8 +1800,8 @@ trtllm-bench \
                                 <td class="perf-bad">-16.9%</td>
                             </tr>
                         </tbody>
-                    </table>
-                    <h3>Total Latency Performance (Random Dataset)</h3>
+                    </table> -->
+                    <!-- <h3>Total Latency Performance (Random Dataset)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -1897,7 +1880,7 @@ trtllm-bench \
                                 <td class="perf-bad">+8.8%</td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table> -->
                     <!-- Expert Parallelism Charts -->
                     <div style="margin-top: 60px; margin-bottom: 60px;">
                         <h2 style="text-align: center; font-size: 2rem; margin-bottom: 40px; background: linear-gradient(135deg, #5E5CE6 0%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Expert Parallelism Analysis</h2>
@@ -1955,7 +1938,7 @@ trtllm-bench \
                             </tbody>
                         </table>
                     </div>
-                    <div style="margin-top: 40px;">
+                    <!-- <div style="margin-top: 40px;">
                         <h3>Expert Parallelism: Latency Impact Across MoE Backends</h3>
                         <table>
                             <thead>
@@ -1982,7 +1965,7 @@ trtllm-bench \
                                 <tr><td>TRTLLM (Closed EP)</td><td>2</td><td>1</td><td>218822.20</td><td class="perf-bad">0%</td></tr>
                             </tbody>
                         </table>
-                    </div>
+                    </div> -->
 
                     <!-- Multi-Model 8 GPU Comparison Section -->
                     <div style="margin-top: 60px; border: 1px solid #5E5CE6; background: rgba(94,92,230,0.05); padding: 40px; border-radius: 16px;">
@@ -2008,7 +1991,7 @@ trtllm-bench \
                             </div>
                         </div>
 
-                        <div style="overflow-x: auto; margin-top: 30px;">
+                        <!-- <div style="overflow-x: auto; margin-top: 30px;">
                             <h3>Detailed Performance Data (8 GPUs, TP=8, EP=8)</h3>
                             <table>
                                 <thead>
@@ -2018,7 +2001,6 @@ trtllm-bench \
                                         <th>Router</th>
                                         <th>Throughput (tok/s/gpu)</th>
                                         <th>Total Latency (ms)</th>
-                                        <!-- <th>Quantization</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2028,7 +2010,6 @@ trtllm-bench \
                                         <td><strong>Default</strong></td>
                                         <td class="perf-good"><strong>19,355</strong></td>
                                         <td>203,157</td>
-                                        <!-- <td>W4A8_MXFP4_MXFP8</td> -->
                                     </tr>
                                     <tr>
                                         <td>GPT-OSS-120B</td>
@@ -2036,7 +2017,6 @@ trtllm-bench \
                                         <td>Round Robin</td>
                                         <td class="perf-good">23,696</td>
                                         <td>165,942</td>
-                                        <!-- <td>W4A8_MXFP4_MXFP8</td> -->
                                     </tr>
                                     <tr>
                                         <td>GPT-OSS-120B</td>
@@ -2044,7 +2024,6 @@ trtllm-bench \
                                         <td>Default</td>
                                         <td>14,678</td>
                                         <td>267,898</td>
-                                        <!-- <td>W4A8_MXFP4_MXFP8</td> -->
                                     </tr>
                                     <tr>
                                         <td>GPT-OSS-120B</td>
@@ -2052,7 +2031,6 @@ trtllm-bench \
                                         <td>Round Robin</td>
                                         <td>17,665</td>
                                         <td>222,592</td>
-                                        <!-- <td>W4A8_MXFP4_MXFP8</td> -->
                                     </tr>
                                     <tr class="highlight" style="background: rgba(245, 158, 11, 0.15);">
                                         <td><strong>Qwen3-235B-A22B</strong></td>
@@ -2060,7 +2038,6 @@ trtllm-bench \
                                         <td><strong>Default</strong></td>
                                         <td class="perf-neutral"><strong>2,897</strong></td>
                                         <td>1,357,350</td>
-                                        <!-- <td>NA</td> -->
                                     </tr>
                                     <tr>
                                         <td>Qwen3-235B-A22B</td>
@@ -2068,7 +2045,6 @@ trtllm-bench \
                                         <td>Round Robin</td>
                                         <td class="perf-neutral">3,219</td>
                                         <td>1,221,393</td>
-                                        <!-- <td>NA</td> -->
                                     </tr>
                                     <tr>
                                         <td>Qwen3-235B-A22B</td>
@@ -2076,7 +2052,6 @@ trtllm-bench \
                                         <td>Default</td>
                                         <td>2,851</td>
                                         <td>1,379,004</td>
-                                        <!-- <td>NA</td> -->
                                     </tr>
                                     <tr>
                                         <td>Qwen3-235B-A22B</td>
@@ -2084,7 +2059,6 @@ trtllm-bench \
                                         <td>Round Robin</td>
                                         <td>3,188</td>
                                         <td>1,233,305</td>
-                                        <!-- <td>NA</td> -->
                                     </tr>
                                     <tr class="highlight" style="background: rgba(239, 68, 68, 0.15);">
                                         <td><strong>DeepSeek-V3</strong></td>
@@ -2092,7 +2066,6 @@ trtllm-bench \
                                         <td><strong>Default</strong></td>
                                         <td class="perf-neutral"><strong>2,598</strong></td>
                                         <td>1,513,529</td>
-                                        <!-- <td>FP8_BLOCK_SCALES</td> -->
                                     </tr>
                                     <tr>
                                         <td>DeepSeek-V3</td>
@@ -2100,7 +2073,6 @@ trtllm-bench \
                                         <td>Round Robin</td>
                                         <td class="perf-neutral">3,081</td>
                                         <td>1,276,345</td>
-                                        <!-- <td>FP8_BLOCK_SCALES</td> -->
                                     </tr>
                                     <tr class="highlight" style="background: rgba(168, 85, 247, 0.15);">
                                         <td><strong>DeepSeek-R1</strong></td>
@@ -2108,7 +2080,6 @@ trtllm-bench \
                                         <td><strong>Default</strong></td>
                                         <td class="perf-neutral"><strong>2,586</strong></td>
                                         <td>1,520,385</td>
-                                        <!-- <td>FP8_BLOCK_SCALES</td> -->
                                     </tr>
                                     <tr>
                                         <td>DeepSeek-R1</td>
@@ -2116,11 +2087,10 @@ trtllm-bench \
                                         <td>Round Robin</td>
                                         <td class="perf-neutral">3,107</td>
                                         <td>1,265,684</td>
-                                        <!-- <td>FP8_BLOCK_SCALES</td> -->
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
+                        </div> -->
 
                         <!-- <div style="margin-top: 30px; padding: 20px; background: rgba(94,92,230,0.08); border-radius: 12px; border-left: 4px solid #5E5CE6;">
                             <h4 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.1rem;">💡 Key Observations</h4>
