@@ -1074,7 +1074,7 @@ trtllm-bench \
             </h2>
             <p style="color: #cbd5e1; font-size: 1rem; line-height: 1.8;">
                 With the baseline established, we analyze behavior across three representative workloads:
-                <strong>Random</strong> (wide-decode stress test), <strong>ShareGPT</strong> (chat traffic), and <strong>openMath</strong> (math reasoning).
+                <strong>Random</strong>, <strong>ShareGPT</strong>, and <strong>openMath</strong>.
             </p>
         </div>
 
@@ -1310,14 +1310,55 @@ trtllm-bench \
         <!-- ShareGPT Dataset Content -->
         <div id="sharegpt-content" class="dataset-content">
             <div class="section">
-                <h2>GPT-OSS-120B: Detailed Analysis</h2>
+                <h2>ShareGPT Dataset: Scaling & Load Balance Analysis</h2>
                 
                 <div class="chart-container">
-                    <h3>Throughput/GPU Scaling (Higher is Better)</h3>
+                    <h3>Throughput/GPU Scaling with GPU Count</h3>
                     <div class="chart-wrapper">
                         <canvas id="sharegpt-throughput-chart"></canvas>
                     </div>
                 </div>
+
+                <!-- Theoretical Analysis Section -->
+                <div class="analysis-container">
+                    <h2 style="color: #60a5fa; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        Analysis: Linear Scaling increase of the per gpu throughput
+                    </h2>
+                    
+                    <p style="color: #cbd5e1; margin-bottom: 25px; font-size: 1.05rem; line-height: 1.7;">
+                        Our benchmark reveals a counter-intuitive phenomenon: <strong>Per-GPU throughput rises linearly</strong> from 1 to 4 GPUs, implying a super-linear total speedup. However, this trend abruptly reverses at 8 GPUs. This behavior marks the transition between two distinct regimes: the <strong>Memory-Bound Regime</strong> and the <strong>Latency-Bound Regime</strong>.
+                    </p>
+
+                    <div class="regime-grid">
+                        <div class="regime-card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%);">
+                            <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
+                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token. In our benchmark we keep the work per GPU fixed (640 active sequences per GPU), so the only thing that really changes is <strong>how quickly each GPU can finish a decode step</strong>.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
+                                At 1 GPU the step is dominated by waiting for weights to arrive from memory; as we add more GPUs, we effectively <strong>aggregate HBM bandwidth</strong> and chip away at that memory stall. The step latency per GPU goes down almost in proportion to the number of GPUs, so per-GPU throughput climbs nearly linearly from 1 → 4. Total cluster throughput even looks super-linear, because you have more GPUs and each GPU is also running faster.
+                            </p>
+                        </div>
+
+                        <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
+                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
+                                This nice trend breaks at 8 GPUs. By that point, the memory wait time is already very small, so further slicing the model does not help much. Instead, <strong>two new effects start to dominate</strong>.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
+                                The learned router no longer keeps the load perfectly balanced: some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="callout-note">
+                        <div class="callout-title">⚠️ Note: Decode vs. Prefill Dynamics</div>
+                        <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6;">
+                            This analysis focuses on the <strong>Decode Phase (Generation)</strong>, which dominates our 2k-output workload (>99% of runtime). Decode is inherently memory/latency-bound.
+                        </p>
+                    </div>
+                </div>
+
                 <h2>ShareGPT: Multi-Model Performance Comparison</h2>
                 
                 <!-- Model Comparison Chart -->
@@ -2182,13 +2223,53 @@ trtllm-bench \
 
             <!-- openMath Charts and Analysis -->
             <div class="section">
-                <h2>nvidia/openMath: Multi-Model Performance Analysis</h2>
+                <h2>nvidia/openMath: Scaling & Load Balance Analysis</h2>
                 
                 <!-- GPT-OSS-120B Throughput Chart -->
                 <div class="chart-container">
-                    <h3>GPT-OSS-120B Throughput Scaling (Higher is Better)</h3>
+                    <h3>Throughput/GPU Scaling with GPU Count</h3>
                     <div class="chart-wrapper">
                         <canvas id="openmath-gpt-throughput-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Theoretical Analysis Section -->
+                <div class="analysis-container">
+                    <h2 style="color: #60a5fa; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        Analysis: Linear Scaling increase of the per gpu throughput
+                    </h2>
+                    
+                    <p style="color: #cbd5e1; margin-bottom: 25px; font-size: 1.05rem; line-height: 1.7;">
+                        Our benchmark reveals a counter-intuitive phenomenon: <strong>Per-GPU throughput rises linearly</strong> from 1 to 4 GPUs, implying a super-linear total speedup. However, this trend abruptly reverses at 8 GPUs. This behavior marks the transition between two distinct regimes: the <strong>Memory-Bound Regime</strong> and the <strong>Latency-Bound Regime</strong>.
+                    </p>
+
+                    <div class="regime-grid">
+                        <div class="regime-card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%);">
+                            <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
+                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token. In our benchmark we keep the work per GPU fixed (640 active sequences per GPU), so the only thing that really changes is <strong>how quickly each GPU can finish a decode step</strong>.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
+                                At 1 GPU the step is dominated by waiting for weights to arrive from memory; as we add more GPUs, we effectively <strong>aggregate HBM bandwidth</strong> and chip away at that memory stall. The step latency per GPU goes down almost in proportion to the number of GPUs, so per-GPU throughput climbs nearly linearly from 1 → 4. Total cluster throughput even looks super-linear, because you have more GPUs and each GPU is also running faster.
+                            </p>
+                        </div>
+
+                        <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
+                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
+                                This nice trend breaks at 8 GPUs. By that point, the memory wait time is already very small, so further slicing the model does not help much. Instead, <strong>two new effects start to dominate</strong>.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
+                                The learned router no longer keeps the load perfectly balanced: some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="callout-note">
+                        <div class="callout-title">⚠️ Note: Decode vs. Prefill Dynamics</div>
+                        <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6;">
+                            This analysis focuses on the <strong>Decode Phase (Generation)</strong>, which dominates our 2k-output workload (>99% of runtime). Decode is inherently memory/latency-bound.
+                        </p>
                     </div>
                 </div>
 
