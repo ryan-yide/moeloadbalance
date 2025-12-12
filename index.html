@@ -882,12 +882,20 @@
                         <div style="margin-top: 30px; background: rgba(20, 20, 22, 0.6); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 20px;">
                             <h4 style="color: #ef4444; margin-bottom: 15px; text-align: center; font-size: 1.1rem;">Visualizing the Problem: The Straggler Effect</h4>
                             <img src="./images/step030_heatmap.png" alt="MoE Expert Load Distribution Heatmap" style="max-width: 100%; width: 100%; height: auto; border-radius: 8px; margin: 0 auto; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-                            <p style="text-align: center; color: #cbd5e1; margin-top: 15px; font-size: 0.9rem; line-height: 1.6;">
+                            <!-- <p style="text-align: center; color: #cbd5e1; margin-top: 15px; font-size: 0.9rem; line-height: 1.6;">
                                 <strong>Evidence of Imbalance:</strong> Darker regions indicate "Hot" GPUs processing more tokens (longer kernel execution time), while lighter regions are GPUs that processed fewer tokens (finished quickly) and are now waiting at the synchronization barrier. This gap represents wasted computation resources.
+                            </p> -->
+                            <p style="text-align: center; color: #cbd5e1; margin-top: 15px; font-size: 0.9rem; line-height: 1.6;">
+                            <strong>What this heatmap measures (MoE-only):</strong>
+                            Each cell shows the <strong>GPU-side execution time</strong> of the <strong>MoE MLP (expert FFN) CUDA kernels</strong> within a single forward step.
+                            We intentionally <strong>exclude attention kernels, quantization, normaliation and all-to-all communication</strong> to isolate routing-induced imbalance in the expert path.
+                            Darker cells indicate “hot” GPUs that processed more routed tokens (longer expert-kernel time),
+                            while lighter cells indicate GPUs that finished earlier and then <strong>wait at synchronization</strong> for stragglers.
+                            The contrast directly corresponds to <strong>wasted compute due to imbalance</strong>.
                             </p>
                             
                             <!-- How the Heatmap is Generated -->
-                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(239, 68, 68, 0.2);">
+                            <!-- <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(239, 68, 68, 0.2);">
                                 <h5 style="color: #f59e0b; margin-bottom: 12px; font-size: 1rem;">How This Heatmap is Generated</h5>
                                 <ol style="color: #cbd5e1; font-size: 0.85rem; line-height: 1.7; padding-left: 20px;">
                                     <li>
@@ -906,7 +914,7 @@
                                 <p style="color: #8E8E93; font-size: 0.8rem; margin-top: 10px; font-style: italic;">
                                     Key Insight: The heatmap directly translates routing imbalance into hardware-level performance bottlenecks, making the straggler problem visually evident.
                                 </p>
-                            </div>
+                            </div> -->
                         </div>
 
                         <h3 style="color: #8b5cf6; margin-top: 25px; margin-bottom: 15px; font-size: 1.2rem;">
