@@ -831,11 +831,6 @@
                                     Runs the model's actual learned gating weights. Any performance drop compared to the Control Group can be 
                                     strictly attributed to <strong>algorithmic load imbalance</strong> rather than hardware limitations.
                                 </li>
-                                <li style="margin-bottom: 0;">
-                                    <strong style="color: #60a5fa;">• Full Hardware Stack:</strong> 
-                                    Both configurations execute the complete MoE pipeline (Top-K → Softmax → All-to-All → GEMM), 
-                                    measuring <em>real physical latency</em> rather than theoretical estimates.
-                                </li>
                             </ul>
                         </div>
                         
@@ -915,24 +910,15 @@
                         </div>
 
                         <h3 style="color: #8b5cf6; margin-top: 25px; margin-bottom: 15px; font-size: 1.2rem;">
-                            💡 Key Technical Properties
+                            Key Technical Properties
                         </h3>
                         
                         <ul style="color: #d1d5db; line-height: 2; padding-left: 25px;">
                             <li>
                                 <strong style="color: #60a5fa;">Benchmark-Only Tool:</strong> 
                                 Round Robin is <strong>not a solution</strong>—it breaks model accuracy by overriding learned routing. 
-                                It serves solely as a <strong>controlled baseline</strong> to measure the hardware's theoretical peak under perfect load balance.
-                            </li>
-                            <li>
-                                <strong style="color: #60a5fa;">GPU-Aware Load Balancing:</strong> 
-                                The Round Robin mechanism enforces <strong>inter-GPU</strong> balance within the EP group (±1 token difference), 
+                                It serves solely as a <strong>controlled baseline</strong> to measure the hardware's theoretical peak under perfect load balance. The Round Robin mechanism enforces <strong>inter-GPU</strong> balance within the EP group (±1 token difference), 
                                 eliminating the straggler effect to reveal maximum NVLink bandwidth utilization.
-                            </li>
-                            <li>
-                                <strong style="color: #60a5fa;">Full Computation Graph:</strong> 
-                                Unlike theoretical estimates, this approach executes the complete MoE pipeline including gating, routing, 
-                                GEMM kernels, and All-to-All communication—measuring <em>actual hardware latency</em> under ideal load distribution.
                             </li>
                         </ul>
 
