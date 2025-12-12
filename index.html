@@ -789,10 +789,11 @@
     <div class="container">
         <header>
             <h1>MoE at Scale on B200 GPUs: Expert Load Balance, and Backend Performance</h1>
-            <p style="color:#cbd5e1; max-width: 850px; margin: 20px auto 0; font-size: 1.05rem; line-height: 1.7;">
-                This post presents a deep-dive analysis of <strong>Sparse MoE Inference on NVIDIA B200</strong>, isolating two critical performance drivers: 
-                <strong>(1) MoE Backend</strong> (CUTLASS vs. TensorRT-LLM) and <strong>(2) Load Balance</strong> (Real Router vs Round Robin). By benchmarking <strong>GPT-OSS-120B, DeepSeek-R1, DeepSeek-V3, Qwen3-235B-A22B</strong> across varying scales (TP/EP), we quantify how backend choice impacts kernel execution and how expert load imbalance creates an "Efficiency Gap" on the B200 hardware architecture.
-            </p>
+            <div style="background: rgba(10,10,10,0.5); border: 1px solid rgba(94,92,230,0.2); border-radius: 12px; padding: 28px 32px; max-width: 950px; margin: 24px auto 0;">
+                <p style="color:#cbd5e1; margin: 0; font-size: 1.08rem; line-height: 1.75;">
+                    This post analyzes <strong>Sparse MoE Inference on NVIDIA B200</strong>, isolating two critical drivers: <strong>(1) MoE Backend</strong> (CUTLASS vs. TensorRT-LLM) and <strong>(2) Load Balance</strong> (Real Router vs Round Robin). By benchmarking GPT-OSS-120B, DeepSeek-R1, DeepSeek-V3, Qwen3-235B-A22B across TP/EP scales, we quantify kernel performance impact and the "Efficiency Gap" from load imbalance. Key finding: MoE load imbalance has minimal impact on B200 hardware—suggesting that B200 is highly resilient to routing skew.
+                </p>
+            </div>
         </header>
 
         <!-- Methodology Section (Always Visible) -->
@@ -1638,13 +1639,13 @@ trtllm-bench \
                     <div class="insight-section-group">
                         <h4 class="insight-subsection-title">What works well on B200</h4>
                         <ul class="insight-list">
-                            <li><strong>CUTLASS + Open EP:</strong> Consistently delivers the best throughput for GPT-OSS-120B, outperforming TRT-LLM by ~30% in our tests.</li>
+                            <li><strong>CUTLASS + Open EP:</strong> Consistently delivers the best throughput for GPT-OSS-120B, outperforming TRT-LLM.</li>
                             <li><strong>Linear Scaling (1→4 GPUs):</strong> The system stays in the "Memory-Wall Breakout" regime. Aggregating HBM and NVLink yields near-linear per-GPU gains.</li>
                         </ul>
                     </div>
                     
                     <div class="insight-section-group">
-                        <h4 class="insight-subsection-title">💡 Practical Mitigations</h4>
+                        <h4 class="insight-subsection-title">Practical Mitigations</h4>
                         <ul class="insight-list">
                             <li>Tune auxiliary load‑balancing loss and capacity factor; consider dropless routing when feasible</li>
                             <li><strong>Speculative decoding–based expert prefetch</strong>: use a lightweight drafter to predict token‑to‑expert routes, prefetch the top‑k “hot” experts ahead of verification, and cap overfetch with a cutoff policy.</li>
@@ -1803,6 +1804,79 @@ trtllm-bench \
                     }
                 }
             };
+
+            // ===== Intro: Random throughput mini chart =====
+            const introCtx = document.getElementById('intro-random-throughput-chart');
+            if (introCtx) {
+                const introOptions = JSON.parse(JSON.stringify(commonOptions));
+                introOptions.scales.x.title.text = 'Number of GPUs';
+                introOptions.scales.y.title.text = 'Throughput per GPU (tok/s)';
+                introOptions.plugins.legend.labels.font.size = 12;
+                introOptions.scales.x.ticks.font.size = 12;
+                introOptions.scales.y.ticks.font.size = 12;
+
+                new Chart(introCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1', '2', '4', '8'],
+                        datasets: [
+                            // CUTLASS
+                            {
+                                label: 'CUTLASS Ideal',
+                                data: [14902.7639, 19702, 23277, 23696],
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                                borderWidth: 3,
+                                borderDash: [8, 4],
+                                tension: 0.2,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#10b981',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            },
+                            {
+                                label: 'CUTLASS Actual',
+                                data: [15795, 18550, 20859, 19355],
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                                borderWidth: 3,
+                                tension: 0.2,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#10b981',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            },
+                            // TRTLLM
+                            {
+                                label: 'TRTLLM Ideal',
+                                data: [14530.8435, 18582, 19639, 17665],
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.08)',
+                                borderWidth: 3,
+                                borderDash: [8, 4],
+                                tension: 0.2,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#60a5fa',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            },
+                            {
+                                label: 'TRTLLM Actual',
+                                data: [14256, 17161, 18051, 14678],
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.08)',
+                                borderWidth: 3,
+                                tension: 0.2,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#60a5fa',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            }
+                        ]
+                    },
+                    options: introOptions
+                });
+            }
 
             // ShareGPT Model Comparison Chart (8 GPUs)
             const sharegptModelComparisonCtx = document.getElementById('sharegpt-model-comparison-chart');
