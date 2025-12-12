@@ -1207,10 +1207,13 @@ trtllm-bench \
             <div class="section">
                 <h2>Random Dataset: Scaling & Load Balance Analysis</h2>
                 
-                <div class="chart-container">
+                <div class="chart-container" style="position: relative;">
                     <h3>Throughput/GPU Scaling with GPU Count</h3>
                     <div class="chart-wrapper">
                         <canvas id="random-scaling-chart"></canvas>
+                    </div>
+                    <div style="position: absolute; right: 20px; top: 30px; max-width: 240px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); border-radius: 10px; padding: 12px 14px; color: #cbd5e1; font-size: 0.85rem; line-height: 1.5; backdrop-filter: blur(8px);">
+                        <strong style="color: #10b981;">Key insight:</strong> Per-GPU throughput scales linearly 1→4 GPUs, then drops at 8 GPUs due to substantial load imbalance.
                     </div>
                 </div>
 
