@@ -1646,8 +1646,8 @@ trtllm-bench \
                     <div class="insight-section-group">
                         <h4 class="insight-subsection-title">Practical Mitigations</h4>
                         <ul class="insight-list">
-                            <!-- <li>Tune auxiliary load‑balancing loss and capacity factor; consider dropless routing when feasible</li> -->
                             <li><strong>Speculative decoding–based expert prefetch</strong>: use a lightweight drafter to predict token‑to‑expert routes, prefetch the top‑k “hot” experts ahead of verification, and cap overfetch with a cutoff policy.</li>
+                            <li><strong>Capacity-aware routing (overflow control)</strong>: enforce per-expert/per-rank token capacity during routing; when an expert is overloaded, spill overflow tokens to backup experts (or lower-ranked top-k candidates) to prevent worst-case synchronization stalls.</li>
                         </ul>
                     </div>
                 </div>
