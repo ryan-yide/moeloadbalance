@@ -862,70 +862,6 @@
             </div>
         </div>
 
-        <!-- Command Section -->
-        <div class="command-section">
-            <div class="section-header" onclick="toggleSection(this)">
-                    <div class="toggle-icon">▶</div>
-                    <h2>⚙️ Run High Throughput Benchmark Command</h2>
-                </div>
-                <div class="section-content">
-                    <!-- Enable Round Robin Command -->
-                    <div class="command-section" style="margin-top: 0; margin-bottom: 32px;">
-                        <h2 style="color: #60a5fa;">Enable Round Robin</h2>
-                        <div class="code-block">
-                            <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
-                            <code>export ENABLE_PERFECT_ROUTER=1</code>
-                        </div>
-                        <p style="color: #8E8E93; margin-top: 10px;">Set this environment variable before running your MoE backend to enable perfect routing for benchmarking.</p>
-                    </div>
-
-                    <!-- Complete Benchmark Command -->
-                    <div class="command-section" style="margin-top: 0; margin-bottom: 32px;">
-                        <div class="section-header" onclick="toggleSection(this)" style="cursor: pointer;">
-                            <div class="toggle-icon collapsed">▶</div>
-                            <h2 style="color: #60a5fa;">Complete Benchmark Script</h2>
-                        </div>
-                        <div class="section-content collapsed">
-                            <div class="code-block">
-                                <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
-                                <code>num_gpus=4
-max_batch_size=640
-
-cat &lt;&lt;EOF &gt; max_throughput.yaml
-enable_attention_dp: true
-cuda_graph_config:
-    max_batch_size: ${max_batch_size}
-    enable_padding: true
-stream_interval: 10
-moe_config:
-    backend: CUTLASS
-EOF
-
-trtllm-bench \
-    --model openai/gpt-oss-120b \
-    throughput \
-    --backend pytorch \
-    --tp ${num_gpus} \
-    --ep ${num_gpus} \
-    --extra_llm_api_options max_throughput.yaml \
-    --dataset gpt-oss-120b-1k2k.txt \
-    --max_batch_size ${max_batch_size} \
-    --concurrency $((max_batch_size * num_gpus)) \
-    --num_requests $((max_batch_size * num_gpus * 3)) \
-    --kv_cache_free_gpu_mem_fraction 0.9 \
-    --streaming \
-    --warmup 0 \
-    --report_json max_throughput_benchmark.json</code>
-                            </div>
-                            <p style="color: #8E8E93; margin-top: 10px;">
-                                Full benchmark command for running max throughput test on GPT-OSS-120B with 4 GPUs, using CUTLASS backend and Random Dataset (1k input/2k output).
-                                Adjust <code style="background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 2px 6px; border-radius: 4px;">num_gpus</code> for different configurations (2, 4, or 8).
-                            </p>
-                        </div>
-                    </div>
-                </div>
-        </div>
-
         <!-- Methodology Section (Always Visible) -->
         <div style="background: rgba(30, 30, 35, 0.8); border: 1px solid rgba(94, 92, 230, 0.3); border-radius: 12px; padding: 30px; margin: 40px 0; backdrop-filter: blur(10px);">
             <h2 style="color: #60a5fa; margin-bottom: 20px; font-size: 1.5rem;">
@@ -1080,6 +1016,73 @@ trtllm-bench \
                                 relative to the hardware's theoretical peak under perfect load distribution.
                             </p>
                         </div> -->
+
+                        <!-- How to Reproduce Section -->
+                        <div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(94, 92, 230, 0.3);">
+                            <h3 style="color: #60a5fa; margin-bottom: 20px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px;">
+                                🛠️ How to Reproduce: High Throughput Benchmark
+                            </h3>
+                            
+                            <p style="color: #8E8E93; margin-bottom: 20px;">
+                                You can replicate this methodology using the following commands to enable the perfect router and run the throughput test.
+                            </p>
+
+                            <div style="margin-bottom: 25px;">
+                                <h4 style="color: #cbd5e1; font-size: 1rem; margin-bottom: 10px;">Step 1: Enable Round Robin (Environment Variable)</h4>
+                                <div class="code-block" style="margin: 0;">
+                                    <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
+                                    <code>export ENABLE_PERFECT_ROUTER=1</code>
+                                </div>
+                                <p style="color: #8E8E93; margin-top: 10px; font-size: 0.9rem;">
+                                    Set this environment variable before running your MoE backend to enable perfect routing for benchmarking.
+                                </p>
+                            </div>
+
+                            <div>
+                                <div class="section-header" onclick="toggleSection(this)" style="cursor: pointer; background: rgba(10,10,10,0.5); padding: 15px; border-radius: 8px; border: 1px solid #2C2C2E;">
+                                    <div class="toggle-icon collapsed">▶</div>
+                                    <h4 style="color: #60a5fa; margin: 0; font-size: 1rem;">Step 2: Run Complete Benchmark Script</h4>
+                                </div>
+                                <div class="section-content collapsed" style="margin-top: 10px;">
+                                    <div class="code-block">
+                                        <button class="copy-button" onclick="copyToClipboard(event)">📋 Copy</button>
+                                        <code>num_gpus=4
+max_batch_size=640
+
+cat &lt;&lt;EOF &gt; max_throughput.yaml
+enable_attention_dp: true
+cuda_graph_config:
+    max_batch_size: ${max_batch_size}
+    enable_padding: true
+stream_interval: 10
+moe_config:
+    backend: CUTLASS
+EOF
+
+trtllm-bench \
+    --model openai/gpt-oss-120b \
+    throughput \
+    --backend pytorch \
+    --tp ${num_gpus} \
+    --ep ${num_gpus} \
+    --extra_llm_api_options max_throughput.yaml \
+    --dataset gpt-oss-120b-1k2k.txt \
+    --max_batch_size ${max_batch_size} \
+    --concurrency $((max_batch_size * num_gpus)) \
+    --num_requests $((max_batch_size * num_gpus * 3)) \
+    --kv_cache_free_gpu_mem_fraction 0.9 \
+    --streaming \
+    --warmup 0 \
+    --report_json max_throughput_benchmark.json</code>
+                                    </div>
+                                    <!-- <p style="color: #8E8E93; margin-top: 10px; font-size: 0.9rem;">
+                                        Full benchmark command for running max throughput test on GPT-OSS-120B with 4 GPUs, using CUTLASS backend and Random Dataset (1k input/2k output).
+                                        Adjust <code style="background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 2px 6px; border-radius: 4px;">num_gpus</code> for different configurations (2, 4, or 8).
+                                    </p> -->
+                                </div>
+                            </div>
+                        </div>
+
         </div>
 
         <!-- MoE Architecture Diagram Section -->
@@ -1192,124 +1195,6 @@ trtllm-bench \
                         <canvas id="sharegpt-perfect-router-chart"></canvas>
                     </div>
                 </div>
-
-                <!-- Model Comparison Table -->
-                <!-- <div style="overflow-x: auto; margin-top: 30px;">
-                    <h3>Model Performance Comparison (ShareGPT Dataset)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Model</th>
-                                <th>GPUs</th>
-                                <th>MoE Backend</th>
-                                <th>Router Type</th>
-                                <th>Output Throughput (tok/s/gpu)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="highlight">
-                                <td><strong>GPT-OSS-120B</strong></td>
-                                <td><strong>8</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td class="perf-good"><strong>23,702</strong></td>
-                            </tr>
-                            <tr>
-                                <td>GPT-OSS-120B</td>
-                                <td>8</td>
-                                <td>CUTLASS</td>
-                                <td>Default</td>
-                                <td>22,051</td>
-                            </tr>
-                            <tr>
-                                <td>GPT-OSS-120B</td>
-                                <td>8</td>
-                                <td>TRT-LLM</td>
-                                <td>Round Robin</td>
-                                <td>17,739</td>
-                            </tr>
-                            <tr>
-                                <td>GPT-OSS-120B</td>
-                                <td>8</td>
-                                <td>TRT-LLM</td>
-                                <td>Default</td>
-                                <td>16,425</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>DeepSeek-V3</strong></td>
-                                <td><strong>8</strong></td>
-                                <td><strong>DeepGeMM</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td class="perf-good"><strong>3,061</strong></td>
-                            </tr>
-                            <tr>
-                                <td>DeepSeek-V3</td>
-                                <td>8</td>
-                                <td>DeepGeMM</td>
-                                <td>Default</td>
-                                <td>2,712</td>
-                            </tr>
-                            <tr>
-                                <td>DeepSeek-V3</td>
-                                <td>7</td>
-                                <td>DeepGeMM</td>
-                                <td>Round Robin</td>
-                                <td>3,409</td>
-                            </tr>
-                            <tr>
-                                <td>DeepSeek-V3</td>
-                                <td>7</td>
-                                <td>DeepGeMM</td>
-                                <td>Default</td>
-                                <td>3,178</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>DeepSeek-R1</strong></td>
-                                <td><strong>8</strong></td>
-                                <td><strong>DeepGeMM</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td class="perf-good"><strong>3,111</strong></td>
-                            </tr>
-                            <tr>
-                                <td>DeepSeek-R1</td>
-                                <td>8</td>
-                                <td>DeepGeMM</td>
-                                <td>Default</td>
-                                <td>2,854</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>Qwen3-235B-A22B</strong></td>
-                                <td><strong>8</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td class="perf-neutral"><strong>1,426</strong></td>
-                            </tr>
-                            <tr>
-                                <td>Qwen3-235B-A22B</td>
-                                <td>8</td>
-                                <td>CUTLASS</td>
-                                <td>Default</td>
-                                <td>1,358</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div> -->
-
-                <!-- <h2 style="margin-top: 60px;">GPT-OSS-120B: Detailed Analysis</h2>
-                
-                <div class="chart-container">
-                    <h3>Throughput/GPU Scaling (Higher is Better)</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="sharegpt-throughput-chart"></canvas>
-                    </div>
-                </div> -->
-
-                <!-- <div class="chart-container">
-                    <h3>Total Latency Scaling (Lower is Better)</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="sharegpt-latency-chart"></canvas>
-                    </div>
-                </div> -->
                 
                 <div style="overflow-x: auto; margin-top: 30px;">
                     <h3>Throughput Performance (GPT-OSS-120B on ShareGPT)</h3>
@@ -1391,86 +1276,6 @@ trtllm-bench \
                             </tr>
                         </tbody>
                     </table>
-                    
-                    <!-- <h3>Total Latency Performance (ShareGPT Dataset)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>GPUs</th>
-                                <th>EP Size</th>
-                                <th>MoE Backend</th>
-                                <th>Ideal Total Latency (s)</th>
-                                <th>Actual Total Latency (s)</th>
-                                <th>Latency Gap</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>CUTLASS</td>
-                                <td>264.18</td>
-                                <td>255.52</td>
-                                <td class="perf-good">-3.28%</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>TRT-LLM</td>
-                                <td>270.97</td>
-                                <td>279.01</td>
-                                <td class="perf-neutral">+2.97%</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>2</td>
-                                <td>CUTLASS</td>
-                                <td>199.74</td>
-                                <td>209.35</td>
-                                <td class="perf-neutral">+4.81%</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>2</td>
-                                <td>TRT-LLM</td>
-                                <td>212.47</td>
-                                <td>223.48</td>
-                                <td class="perf-neutral">+5.18%</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>4</strong></td>
-                                <td><strong>4</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>169.14</strong></td>
-                                <td><strong>180.64</strong></td>
-                                <td class="perf-neutral"><strong>+6.80%</strong></td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>TRT-LLM</td>
-                                <td>202.92</td>
-                                <td>207.42</td>
-                                <td class="perf-neutral">+2.22%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>8</td>
-                                <td>CUTLASS</td>
-                                <td>165.90</td>
-                                <td>178.32</td>
-                                <td class="perf-bad">+7.48%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>8</td>
-                                <td>TRT-LLM</td>
-                                <td>221.66</td>
-                                <td>239.40</td>
-                                <td class="perf-bad">+8.01%</td>
-                            </tr>
-                        </tbody>
-                    </table> -->
                 </div>
             </div>
         </div>
@@ -1889,16 +1694,28 @@ trtllm-bench \
         
         // Toggle Section Expand/Collapse
         function toggleSection(header) {
-            // Find the closest .command-section parent
-            const section = header.closest('.command-section');
-            // Find the first .section-content inside this section
-            const content = section.querySelector('.section-content');
+            // Find the next sibling .section-content element
+            let content = header.nextElementSibling;
+            // If not found, try finding in the parent's children (fallback for nested structures)
+            if (!content || !content.classList.contains('section-content')) {
+                const section = header.closest('.command-section');
+                if (section) {
+                    content = section.querySelector('.section-content');
+                }
+            }
             const toggleIcon = header.querySelector('.toggle-icon');
-            if (content) {
+            
+            if (content && content.classList.contains('section-content')) {
                 content.classList.toggle('collapsed');
             }
             if (toggleIcon) {
                 toggleIcon.classList.toggle('collapsed');
+                // Update icon text
+                if (toggleIcon.classList.contains('collapsed')) {
+                    toggleIcon.textContent = '▶';
+                } else {
+                    toggleIcon.textContent = '▼';
+                }
             }
         }
 
