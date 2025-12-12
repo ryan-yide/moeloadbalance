@@ -791,7 +791,7 @@
             <h1>MoE at Scale on B200 GPUs: Expert Load Balance, and Backend Performance</h1>
             <div style="background: rgba(10,10,10,0.5); border: 1px solid rgba(94,92,230,0.2); border-radius: 12px; padding: 28px 32px; max-width: 950px; margin: 24px auto 0;">
                 <p style="color:#cbd5e1; margin: 0; font-size: 1.08rem; line-height: 1.75;">
-                    This post analyzes <strong>Sparse MoE Inference on NVIDIA B200</strong>, isolating two critical drivers: <strong>(1) MoE Backend</strong> (CUTLASS vs. TensorRT-LLM) and <strong>(2) Load Balance</strong> (Real Router vs Round Robin). By benchmarking GPT-OSS-120B, DeepSeek-R1, DeepSeek-V3, Qwen3-235B-A22B across TP/EP scales, we quantify kernel performance impact and the "Efficiency Gap" from load imbalance. Key finding: MoE load imbalance has minimal impact on B200 hardware—suggesting that B200 is highly resilient to routing skew.
+                    This blog analyzes <strong>Sparse MoE Inference on NVIDIA B200</strong>, isolating two critical drivers: <strong>(1) MoE Backend</strong> (CUTLASS vs. TensorRT-LLM) and <strong>(2) Load Balance</strong> (Real Router vs Round Robin). By benchmarking GPT-OSS-120B, DeepSeek-R1, DeepSeek-V3, Qwen3-235B-A22B across TP/EP scales, we quantify kernel performance impact and the "Efficiency Gap" from load imbalance. Key finding: MoE load imbalance has minimal impact on B200 hardware—suggesting that B200 is highly resilient to routing skew.
                 </p>
             </div>
         </header>
@@ -1641,13 +1641,26 @@ trtllm-bench \
                         <ul class="insight-list">
                             <li><strong>CUTLASS + Open EP:</strong> Consistently delivers the best throughput for GPT-OSS-120B, outperforming TRT-LLM.</li>
                             <li><strong>Linear Scaling (1→4 GPUs):</strong> The system stays in the "Memory-Wall Breakout" regime. Aggregating HBM and NVLink yields near-linear per-GPU gains.</li>
+                            <li>
+                            <strong>Training-time mitigation has limits:</strong>
+                            Pretraining can encourage balance—e.g., Qwen3 adopts a <strong>global-batch load balancing loss</strong> [3],
+                            and DeepSeek-V3 uses an <strong>auxiliary-loss-free</strong> bias-based balancing mechanism to keep experts balanced during training [4].
+                            However, <strong>in real inference workloads</strong>, we still observe straggler-driven imbalance (and thus throughput gaps)
+                            that cannot be fully eliminated by training-only objectives, motivating runtime measurement and mitigation.
+
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(139, 92, 246, 0.2); font-size: 0.85rem; color: #94a3b8; line-height: 1.6;">
+                                <strong style="color: #8b5cf6;">References:</strong><br>
+                                [3] Qwen Team, et al. (2025). <em>"Qwen3 Technical Report."</em> arXiv:2505.09388. <a href="https://arxiv.org/pdf/2505.09388" target="_blank" rel="noopener" style="color:#60a5fa; text-decoration:none;">PDF</a><br>
+                                [4] DeepSeek-AI, et al. (2024). <em>"DeepSeek-V3 Technical Report."</em> arXiv:2412.19437. <a href="https://arxiv.org/pdf/2412.19437" target="_blank" rel="noopener" style="color:#60a5fa; text-decoration:none;">PDF</a>
+                            </div>
+                            </li>
                         </ul>
                     </div>
                     
                     <div class="insight-section-group">
                         <h4 class="insight-subsection-title">Practical Mitigations</h4>
                         <ul class="insight-list">
-                            <li>Tune auxiliary load‑balancing loss and capacity factor; consider dropless routing when feasible</li>
+                            <!-- <li>Tune auxiliary load‑balancing loss and capacity factor; consider dropless routing when feasible</li> -->
                             <li><strong>Speculative decoding–based expert prefetch</strong>: use a lightweight drafter to predict token‑to‑expert routes, prefetch the top‑k “hot” experts ahead of verification, and cap overfetch with a cutoff policy.</li>
                         </ul>
                     </div>
