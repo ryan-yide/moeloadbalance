@@ -1575,7 +1575,7 @@ trtllm-bench \
                             </tr>
                         </tbody>
                     </table>
-
+                    
                     <!-- <h3>Total Latency Performance (ShareGPT Dataset)</h3>
                     <table>
                         <thead>
@@ -1888,7 +1888,7 @@ trtllm-bench \
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
                             <!-- Throughput Chart -->
                             <div style="background: rgba(28, 28, 30, 0.8); border: 1px solid #2C2C2E; border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
-                                <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa;">Throughput Impact (tok/s)</h3>
+                                <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa;">Throughput Impact(tok/gpu/s)</h3>
                                 <div style="position: relative; height: 350px;">
                                     <canvas id="ep-throughput-chart"></canvas>
                                 </div>
@@ -1899,13 +1899,52 @@ trtllm-bench \
                             
                             <!-- Latency Chart -->
                             <div style="background: rgba(28, 28, 30, 0.8); border: 1px solid #2C2C2E; border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
-                                <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa;">Latency Impact (ms)</h3>
+                                <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa;">Total Latency(ms)</h3>
                                 <div style="position: relative; height: 350px;">
                                     <canvas id="ep-latency-chart"></canvas>
                                 </div>
                                 <p style="font-size: 0.9rem; color: #8E8E93; margin-top: 15px; padding-top: 15px; border-top: 1px solid #2C2C2E;">
                                     Total latency comparison across different GPU configurations and Expert Parallelism sizes. Lower values indicate better performance.
                                 </p>
+                            </div>
+                        </div>
+
+                        <!-- Does Closed vs Open EP make a difference? -->
+                        <div style="margin-top: 40px;">
+                            <h2 style="text-align: center; font-size: 1.8rem; margin-bottom: 20px; color: #60a5fa;">Does Closed vs Open EP make a difference?</h2>
+                            
+                            <!-- EP Explanation Box -->
+                            <div style="background: rgba(94, 92, 230, 0.1); border: 1px solid rgba(94, 92, 230, 0.3); border-radius: 12px; padding: 25px; margin-bottom: 0px; max-width: 1000px; margin-left: auto; margin-right: auto;">
+                                <h3 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.2rem;">Understanding Expert Parallelism (EP)</h3>
+                                <div style="display: grid; gap: 15px;">
+                                    <div style="display: flex; align-items: start; gap: 10px;">
+                                        <span style="color: #10b981; font-size: 1.2rem; font-weight: bold;">●</span>
+                                        <div>
+                                            <strong style="color: #10b981;">Open EP (Experts Sharded Across EP Group):</strong>
+                                            <span style="color: #cbd5e1; display: block; margin-top: 5px; line-height: 1.6;">
+                                                Each GPU holds a unique subset of experts. When EP spans all 8 GPUs in the MoE group, the 120B model's experts are fully distributed across the 8 cards. This maximizes effective HBM capacity and aggregate bandwidth across the cluster, but requires All-to-All communication for token routing.
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: start; gap: 10px;">
+                                        <span style="color: #ef4444; font-size: 1.2rem; font-weight: bold;">●</span>
+                                        <div>
+                                            <strong style="color: #ef4444;">Closed EP (EP Size = 1, Experts Partitioned via TP):</strong>
+                                            <span style="color: #cbd5e1; display: block; margin-top: 5px; line-height: 1.6;">
+                                                Experts are partitioned via Tensor Parallelism. When TP=8 and EP=1, the weights of every expert are sliced across all 8 GPUs. This eliminates the token routing overhead (All-to-All) but requires frequent All-Reduce synchronization for every token's computation, often resulting in lower effective throughput compared to Open EP on high-bandwidth interconnects.
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(94, 92, 230, 0.3);">
+                                    <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin: 0;">
+                                        <strong style="color: #60a5fa;">Our Finding:</strong> 
+                                        The optimal parallelism strategy depends on the backend. 
+                                        <strong style="color: #ef4444;">TRT-LLM</strong> currently favors <strong>Closed EP</strong> (Tensor Parallelism). 
+                                        However, <strong style="color: #10b981;">CUTLASS</strong> scales significantly better with <strong>Open EP</strong>.
+                                        <br><br>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
