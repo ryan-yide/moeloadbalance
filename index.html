@@ -805,7 +805,7 @@
                         <p style="color: #d1d5db; line-height: 1.8; margin-bottom: 20px;">
                             To rigorously isolate <strong>hardware throughput capability</strong> from <strong>model routing inefficiency</strong>, 
                             we <strong>leveraged the static Round Robin routing mechanism</strong> available in TRT-LLM's MoE implementation. 
-                            This is not a theoretical calculation—it's a measurement of physical hardware limits under controlled experts load distribution.
+                            This is not a theoretical calculation—it's a measurement of physical hardware limits under experts load distribution.
                         </p>
 
                         <h3 style="color: #8b5cf6; margin-top: 25px; margin-bottom: 15px; font-size: 1.2rem;">
@@ -1213,7 +1213,7 @@ trtllm-bench \
                         <canvas id="random-scaling-chart"></canvas>
                     </div>
                     <div style="position: absolute; right: 20px; top: 30px; max-width: 240px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); border-radius: 10px; padding: 12px 14px; color: #cbd5e1; font-size: 0.85rem; line-height: 1.5; backdrop-filter: blur(8px);">
-                        <strong style="color: #10b981;">Key insight:</strong> Per-GPU throughput scales linearly 1→4 GPUs, then drops at 8 GPUs due to substantial load imbalance.
+                        Per-GPU throughput scales linearly 1→4 GPUs, then drops at 8 GPUs due to substantial load imbalance.
                     </div>
                 </div>
 
@@ -1538,7 +1538,7 @@ trtllm-bench \
                         <p>
                             Putting the B200 benchmarks together, we isolate three factors: 
                             <strong>(1) Raw GPU Capability</strong>, <strong>(2) Backend Efficiency</strong>, and <strong>(3) Expert Imbalance</strong>. 
-                            Data shows that on B200, <strong>the expert load imbalance dominate the efficiency gap</strong>, far more than the GEMM kernels themselves.
+                            Data shows that on B200, <strong>the expert load imbalance dominates the efficiency gap</strong>, far more than the GEMM kernels themselves.
                         </p>
                     </div>
 
