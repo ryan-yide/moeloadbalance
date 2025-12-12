@@ -795,73 +795,6 @@
             </p>
         </header>
 
-        <div class="gpu-comparison-section">
-            <h2>GPU Architecture Comparison for MoE Inference</h2>
-            <p style="color: #8E8E93; margin-bottom: 20px;">Hardware capabilities comparison across NVIDIA Blackwell, Hopper, and Ampere architectures</p>
-            
-            <table class="gpu-comparison-table">
-                <thead>
-                    <tr>
-                        <th style="width: 20%;">Dimension (MoE-Related)</th>
-                        <th style="width: 28%;">B200 (Blackwell)</th>
-                        <th style="width: 26%;">H100 (Hopper)</th>
-                        <th style="width: 26%;">A100 (Ampere)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="metric-dimension">Tensor Core Gen & Precision</td>
-                        <td class="gpu-b200"><strong>5th Gen</strong><br>FP4/FP6/FP8<br>2nd Gen Transformer Engine</td>
-                        <td class="gpu-h100"><strong>4th Gen</strong><br>FP8 + Transformer Engine</td>
-                        <td class="gpu-a100"><strong>3rd Gen</strong><br>TF32/BF16/FP16/INT8</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-dimension">Low Precision Performance<br>(Per Card)</td>
-                        <td class="gpu-b200"><span class="highlight-value">FP8: 4.5/9 PFLOPS</span><br>(dense/sparse)<br>FP4: ~18 PFLOPS/card</td>
-                        <td class="gpu-h100">FP8: ~2/4 PFLOPS<br>(dense/sparse)</td>
-                        <td class="gpu-a100">BF16/FP16: 312/624 TFLOPS<br>(dense/sparse)</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-dimension">HBM Capacity & Bandwidth</td>
-                        <td class="gpu-b200"><span class="highlight-value">180 GB HBM3e</span><br>~8 TB/s bandwidth</td>
-                        <td class="gpu-h100">80 GB HBM3<br>>3 TB/s bandwidth</td>
-                        <td class="gpu-a100">80 GB HBM2e<br>~2.0 TB/s bandwidth</td>
-                    </tr>
-                    <tr class="comm-highlight">
-                        <td class="metric-dimension">🔗 NVLink Bandwidth<br>(Direct GPU-GPU)</td>
-                        <td class="gpu-b200"><span class="highlight-value">Gen5: 1.8 TB/s</span><br>(18×100 GB/s)</td>
-                        <td class="gpu-h100">Gen4: 900 GB/s</td>
-                        <td class="gpu-a100">Gen3: 600 GB/s</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-dimension">Hardware Decompression</td>
-                        <td class="gpu-b200"><span class="highlight-value">✓ DE Engine</span><br>~600 GB/s decompress<br>Snappy/LZ4/Deflate</td>
-                        <td class="gpu-h100">✗ Not available</td>
-                        <td class="gpu-a100">✗ Not available</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-dimension">New Instructions/Memory</td>
-                        <td class="gpu-b200"><strong>tcgen05.mma</strong><br>Tensor Memory<br>Enhanced TMA broadcast</td>
-                        <td class="gpu-h100">WGMMA + TMA<br>Thread block clusters</td>
-                        <td class="gpu-a100">HMMA</td>
-                    </tr>
-                    <tr style="background: rgba(94,92,230,0.05);">
-                        <td class="metric-dimension"><strong>MoE Impact Summary</strong></td>
-                        <td class="significance">Lower precision + higher bandwidth enables efficient expert weight loading & GEMM fusion</td>
-                        <td class="significance">Strong all-to-all performance with FP8 acceleration</td>
-                        <td class="significance">Baseline MoE support, limited by bandwidth & communication</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div style="margin-top: 20px; padding: 15px; background: rgba(94,92,230,0.1); border-radius: 8px; border-left: 4px solid #5E5CE6;">
-                <p style="color: #cbd5e1; font-size: 0.9rem;">
-                    <strong style="color: #60a5fa;">🔗 Communication Metrics:</strong> The highlighted rows (NVLink bandwidth and NVSwitch domain) directly impact MoE's all-to-all communication patterns. 
-                    B200's 3x improvement in NVLink bandwidth (1.8 TB/s vs 600 GB/s on A100) significantly reduces expert routing overhead in multi-GPU deployments.
-                </p>
-            </div>
-        </div>
-
         <!-- Methodology Section (Always Visible) -->
         <div style="background: rgba(30, 30, 35, 0.8); border: 1px solid rgba(94, 92, 230, 0.3); border-radius: 12px; padding: 30px; margin: 40px 0; backdrop-filter: blur(10px);">
             <h2 style="color: #60a5fa; margin-bottom: 20px; font-size: 1.5rem;">
@@ -1617,6 +1550,89 @@ trtllm-bench \
                             <strong>(1) Raw GPU Capability</strong>, <strong>(2) Backend Efficiency</strong>, and <strong>(3) Expert Imbalance</strong>. 
                             Data shows that on B200, <strong>the expert load imbalance dominate the efficiency gap</strong>, far more than the GEMM kernels themselves.
                         </p>
+                    </div>
+
+                    <div class="insight-section-group">
+                        <h4 class="insight-subsection-title">Why B200 is impacted less by MoE load imbalance</h4>
+                        <ul class="insight-list">
+                            <li><strong>Conclusion:</strong> B200 reduces the relative throughput penalty from MoE stragglers (vs earlier GPUs).</li>
+                            <li><strong>Mechanism:</strong> imbalance → stragglers → synchronization waiting (All-to-All + barriers) → efficiency gap.</li>
+                            <li><strong>Reason on B200:</strong> higher NVLink + higher HBM bandwidth/capacity reduces comm/weight-move fraction, so waiting is a smaller % of the step.</li>
+                        </ul>
+
+                        <details open style="margin-top: 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(94,92,230,0.2); border-radius: 12px; padding: 14px;">
+                            <summary style="cursor:pointer; color:#60a5fa; font-weight:600; outline:none;">
+                                Evidence: B200 vs H100 vs A100 hardware context (bandwidth & comm)
+                            </summary>
+                            <div style="margin-top: 14px;">
+                                <div class="gpu-comparison-section">
+                                    <h2>GPU Architecture Comparison for MoE Inference</h2>
+                                    <p style="color: #8E8E93; margin-bottom: 20px;">Hardware capabilities comparison across NVIDIA Blackwell, Hopper, and Ampere architectures</p>
+                                    
+                                    <table class="gpu-comparison-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 20%;">Dimension (MoE-Related)</th>
+                                                <th style="width: 28%;">B200 (Blackwell)</th>
+                                                <th style="width: 26%;">H100 (Hopper)</th>
+                                                <th style="width: 26%;">A100 (Ampere)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="metric-dimension">Tensor Core Gen & Precision</td>
+                                                <td class="gpu-b200"><strong>5th Gen</strong><br>FP4/FP6/FP8<br>2nd Gen Transformer Engine</td>
+                                                <td class="gpu-h100"><strong>4th Gen</strong><br>FP8 + Transformer Engine</td>
+                                                <td class="gpu-a100"><strong>3rd Gen</strong><br>TF32/BF16/FP16/INT8</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="metric-dimension">Low Precision Performance<br>(Per Card)</td>
+                                                <td class="gpu-b200"><span class="highlight-value">FP8: 4.5/9 PFLOPS</span><br>(dense/sparse)<br>FP4: ~18 PFLOPS/card</td>
+                                                <td class="gpu-h100">FP8: ~2/4 PFLOPS<br>(dense/sparse)</td>
+                                                <td class="gpu-a100">BF16/FP16: 312/624 TFLOPS<br>(dense/sparse)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="metric-dimension">HBM Capacity & Bandwidth</td>
+                                                <td class="gpu-b200"><span class="highlight-value">180 GB HBM3e</span><br>~8 TB/s bandwidth</td>
+                                                <td class="gpu-h100">80 GB HBM3<br>>3 TB/s bandwidth</td>
+                                                <td class="gpu-a100">80 GB HBM2e<br>~2.0 TB/s bandwidth</td>
+                                            </tr>
+                                            <tr class="comm-highlight">
+                                                <td class="metric-dimension">🔗 NVLink Bandwidth<br>(Direct GPU-GPU)</td>
+                                                <td class="gpu-b200"><span class="highlight-value">Gen5: 1.8 TB/s</span><br>(18×100 GB/s)</td>
+                                                <td class="gpu-h100">Gen4: 900 GB/s</td>
+                                                <td class="gpu-a100">Gen3: 600 GB/s</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="metric-dimension">Hardware Decompression</td>
+                                                <td class="gpu-b200"><span class="highlight-value">✓ DE Engine</span><br>~600 GB/s decompress<br>Snappy/LZ4/Deflate</td>
+                                                <td class="gpu-h100">✗ Not available</td>
+                                                <td class="gpu-a100">✗ Not available</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="metric-dimension">New Instructions/Memory</td>
+                                                <td class="gpu-b200"><strong>tcgen05.mma</strong><br>Tensor Memory<br>Enhanced TMA broadcast</td>
+                                                <td class="gpu-h100">WGMMA + TMA<br>Thread block clusters</td>
+                                                <td class="gpu-a100">HMMA</td>
+                                            </tr>
+                                            <tr style="background: rgba(94,92,230,0.05);">
+                                                <td class="metric-dimension"><strong>MoE Impact Summary</strong></td>
+                                                <td class="significance">Lower precision + higher bandwidth enables efficient expert weight loading & GEMM fusion</td>
+                                                <td class="significance">Strong all-to-all performance with FP8 acceleration</td>
+                                                <td class="significance">Baseline MoE support, limited by bandwidth & communication</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div style="margin-top: 20px; padding: 15px; background: rgba(94,92,230,0.1); border-radius: 8px; border-left: 4px solid #5E5CE6;">
+                                        <p style="color: #cbd5e1; font-size: 0.9rem;">
+                                            <strong style="color: #60a5fa;">🔗 Communication Metrics:</strong> The highlighted rows (NVLink bandwidth and NVSwitch domain) directly impact MoE's all-to-all communication patterns. 
+                                            B200's 3x improvement in NVLink bandwidth (1.8 TB/s vs 600 GB/s on A100) significantly reduces expert routing overhead in multi-GPU deployments.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
                     </div>
                     
                     <div class="insight-section-group">
