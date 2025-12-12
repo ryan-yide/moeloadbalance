@@ -1377,7 +1377,7 @@ trtllm-bench \
                                 This nice trend breaks at 8 GPUs. By that point, the memory wait time is already very small, so further slicing the model does not help much. Instead, <strong>two new effects start to dominate</strong>.
                             </p>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
-                                The learned router no longer keeps the load perfectly balanced: some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.
+                                The learned router no longer keeps the load perfectly balanced: some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization.
                             </p>
                         </div>
                     </div>
