@@ -1114,228 +1114,13 @@ trtllm-bench \
             <button class="tab-button active" onclick="switchDataset('random')">
                 Random Dataset(1k/2k)
             </button>
-            <!-- <button class="tab-button" onclick="switchDataset('gsm8k')">
-                GSM8K Dataset
-            </button> -->
+
             <button class="tab-button" onclick="switchDataset('sharegpt')">
                 OpenGVLab/ShareGPT-4o
             </button>
             <button class="tab-button" onclick="switchDataset('openmath')">
                 nvidia/OpenMathInstruct-1
             </button>
-        </div>
-
-        <!-- GSM8K Dataset Content -->
-        <!-- GSM8K Dataset Content -->
-        <div id="gsm8k-content" class="dataset-content">
-            <!-- Hero Results for GSM8K -->
-            <div class="hero-results">
-                <div class="result-card winner">
-                    <h3>
-                        📊 GSM8K Dataset
-                        <span class="winner-badge">Variable Output</span>
-                    </h3>
-                    <div class="result-metric">
-                        <span class="metric-label">Dataset Type</span>
-                        <span class="metric-value">Math Reasoning (openai/gsm8k)</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Output Variance</span>
-                        <span class="metric-value highlight">High (Variable Sequence Length)</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Number of Requests</span>
-                        <span class="metric-value">From NVIDIA Benchmark</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Tokenizer</span>
-                        <span class="metric-value">openai/gpt-oss-120b</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Best Config (4 GPU)</span>
-                        <span class="metric-value">15,622 tok/s/gpu (CUTLASS)</span>
-                    </div>
-                </div>
-
-                <div class="result-card">
-                    <h3>
-                        ⚡ Scaling Efficiency
-                        <span class="winner-badge">Throughput Performance</span>
-                    </h3>
-                    <div class="result-metric">
-                        <span class="metric-label">Ideal</span>
-                        <span class="metric-value">No experts load imbalance</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">EP=4 (CUTLASS)</span>
-                        <span class="metric-value">-2.17% from Ideal</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">EP=4 (TRTLLM)</span>
-                        <span class="metric-value">-3.08% from Ideal</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">EP=8 (CUTLASS)</span>
-                        <span class="metric-value">-7.92% from Ideal</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">EP=8 (TRTLLM)</span>
-                        <span class="metric-value">-10.86% from Ideal</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- GSM8K Charts -->
-            <div class="section">
-                <h2>GSM8K: MOE Load Balance Impact Analysis</h2>
-                
-                <div class="chart-container">
-                    <h3>Throughput/GPU Scaling with GPU Count</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="gsm8k-throughput-chart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>Latency Scaling with GPU Count</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="gsm8k-latency-chart"></canvas>
-                    </div>
-                </div>
-                
-                <!-- Performance Gap Analysis -->
-                <div style="overflow-x: auto; margin-top: 30px;">
-                    <h3>Throughput Performance (GSM8K Dataset)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>GPUs</th>
-                                <th>EP Size</th>
-                                <th>MoE Backend</th>
-                                <th>Ideal Throughput(tokens/s/gpu)</th>
-                                <th>Actual Throughput(tokens/s/gpu)</th>
-                                <th>Throughput Gap</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>2</td>
-                                <td>2</td>
-                                <td>CUTLASS</td>
-                                <td>14,437.10</td>
-                                <td>14,216.19</td>
-                                <td class="perf-neutral">-1.53%</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>2</td>
-                                <td>TRTLLM</td>
-                                <td>14,377.10</td>
-                                <td>14,098.34</td>
-                                <td class="perf-neutral">-1.94%</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>4</strong></td>
-                                <td><strong>4</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>15,968.47</strong></td>
-                                <td><strong>15,622.13</strong></td>
-                                <td class="perf-neutral"><strong>-2.17%</strong></td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>TRTLLM</td>
-                                <td>15,886.68</td>
-                                <td>15,397.04</td>
-                                <td class="perf-neutral">-3.08%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>8</td>
-                                <td>CUTLASS</td>
-                                <td>11,553.53</td>
-                                <td>10,699.03</td>
-                                <td class="perf-bad">-7.92%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>8</td>
-                                <td>TRTLLM</td>
-                                <td>9,666.57</td>
-                                <td>8,616.56</td>
-                                <td class="perf-bad">-10.86%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3>Total Latency Performance (GSM8K Dataset)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>GPUs</th> 
-                                <th>EP Size</th>
-                                <th>MoE Backend</th>
-                                <th>Ideal Total Latency(s)</th>
-                                <th>Actual Total Latency(s)</th>
-                                <th>Latency Gap</th>
-                                
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>2</td>
-                                <td>2</td>
-                                <td>CUTLASS</td>
-                                <td>8.65</td>
-                                <td>8.78</td>
-                                <td class="perf-neutral">+1.55%</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>2</td>
-                                <td>TRTLLM</td>
-                                <td>8.69</td>
-                                <td>8.86</td>
-                                <td class="perf-neutral">+1.98%</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>4</strong></td>
-                                <td><strong>4</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>14.68</strong></td>
-                                <td><strong>15.00</strong></td>
-                                <td class="perf-neutral"><strong>+2.22%</strong></td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>TRTLLM</td>
-                                <td>14.75</td>
-                                <td>15.22</td>
-                                <td class="perf-neutral">+3.18%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>8</td>
-                                <td>CUTLASS</td>
-                                <td>7.90</td>
-                                <td>8.53</td>
-                                <td class="perf-bad">+7.99%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>8</td>
-                                <td>TRTLLM</td>
-                                <td>9.44</td>
-                                <td>10.59</td>
-                                <td class="perf-bad">+12.19%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
         </div>
 
         <!-- ShareGPT Dataset Content -->
@@ -1753,7 +1538,7 @@ trtllm-bench \
                 
                 <!-- Detailed Performance Table -->
                 <div style="overflow-x: auto; margin-top: 30px;">
-                    <!-- <h3>Throughput Performance (Random Dataset)</h3>
+                    <h3>Throughput Performance (Random Dataset)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -1831,87 +1616,8 @@ trtllm-bench \
                                 <td class="perf-bad">-16.9%</td>
                             </tr>
                         </tbody>
-                    </table> -->
-                    <!-- <h3>Total Latency Performance (Random Dataset)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>GPUs</th>   
-                                <th>EP Size</th>
-                                <th>MoE Backend</th>
-                                <th>Ideal Total Latency(s)</th>
-                                <th>Actual Total Latency(s)</th>
-                                <th>Latency Gap</th>
-                                
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>CUTLASS</td>
-                                <td>263.854</td>
-                                <td>248.956</td>
-                                <td class="perf-good">-5.6%</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>1</td>
-                                <td>TRTLLM</td>
-                                <td>270.607</td>
-                                <td>275.824</td>
-                                <td class="perf-neutral">+1.9%</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>2</td>
-                                <td>CUTLASS</td>
-                                <td>199.580</td>
-                                <td>211.977</td>
-                                <td class="perf-neutral">+6.2%</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>2</td>
-                                <td>TRTLLM</td>
-                                <td>211.616</td>
-                                <td>229.135</td>
-                                <td class="perf-neutral">+8.3%</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>4</strong></td>
-                                <td><strong>4</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>168.929</strong></td>
-                                <td><strong>188.509</strong></td>
-                                <td class="perf-bad"><strong>+11.6%</strong></td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>TRTLLM</td>
-                                <td>200.225</td>
-                                <td>217.835</td>
-                                <td class="perf-bad">+8.8%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>8</td>
-                                <td>CUTLASS</td>
-                                <td>168.929</td>
-                                <td>188.509</td>
-                                <td class="perf-bad">+11.6%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>8</td>
-                                <td>TRTLLM</td>
-                                <td>200.225</td>
-                                <td>217.835</td>
-                                <td class="perf-bad">+8.8%</td>
-                            </tr>
-                        </tbody>
-                    </table> -->
+                    </table>
+                    
                     <!-- Expert Parallelism Charts -->
                     <div style="margin-top: 60px; margin-bottom: 60px;">
                         <h2 style="text-align: center; font-size: 2rem; margin-bottom: 40px; background: linear-gradient(135deg, #5E5CE6 0%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Expert Parallelism Analysis</h2>
@@ -1979,63 +1685,6 @@ trtllm-bench \
                             </div>
                         </div>
                     </div>
-                    <!-- Benchmark Results Table -->
-                     <div style="margin-top: 40px;">
-                        <h3>Expert Parallelism: Throughput Impact Across MoE Backends</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>MoE Backend</th>
-                                    <th>GPUs</th>
-                                    <th>EP Size</th>
-                                    <th>Output Throughput/GPU (tok/s)</th>
-                                    <th>Throughput Gap (%)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>8</strong></td><td><strong>8</strong></td><td><strong>19355.29</strong></td><td class="perf-good"><strong>+30.5%</strong></td></tr>
-                                <tr><td>CUTLASS (Closed EP)</td><td>8</td><td>1</td><td>14834.88</td><td class="perf-good">0%</td></tr>
-                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><strong>20859.29</strong></td><td class="perf-neutral"><strong>+11.1%</strong></td></tr>
-                                <tr><td>CUTLASS (Closed EP)</td><td>4</td><td>1</td><td>18785.89</td><td class="perf-neutral">0%</td></tr>
-                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>2</strong></td><td><strong>2</strong></td><td><strong>18549.97</strong></td><td class="perf-neutral"><strong>+7.5%</strong></td></tr>
-                                <tr><td>CUTLASS (Closed EP)</td><td>2</td><td>1</td><td>17249.07</td><td class="perf-neutral">0%</td></tr>
-                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>8</strong></td><td><strong>8</strong></td><td><strong>14677.82</strong></td><td class="perf-bad"><strong>-13.4%</strong></td></tr>
-                                <tr><td>TRTLLM (Closed EP)</td><td>8</td><td>1</td><td>16954.52</td><td class="perf-bad">0%</td></tr>
-                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><strong>18051.06</strong></td><td class="perf-bad"><strong>-12.3%</strong></td></tr>
-                                <tr><td>TRTLLM (Closed EP)</td><td>4</td><td>1</td><td>20584.83</td><td class="perf-bad">0%</td></tr>
-                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>2</strong></td><td><strong>2</strong></td><td><strong>17160.87</strong></td><td class="perf-bad"><strong>-4.5%</strong></td></tr>
-                                <tr><td>TRTLLM (Closed EP)</td><td>2</td><td>1</td><td>17969.66</td><td class="perf-bad">0%</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- <div style="margin-top: 40px;">
-                        <h3>Expert Parallelism: Latency Impact Across MoE Backends</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>MoE Backend</th>
-                                    <th>GPUs</th>
-                                    <th>EP Size</th>
-                                    <th>Total Latency (ms)</th>
-                                    <th>Latency Gap (%)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>8</strong></td><td><strong>8</strong></td><td><strong>203156.85</strong></td><td class="perf-good"><strong>-23.3%</strong></td></tr>
-                                <tr><td>CUTLASS (Closed EP)</td><td>8</td><td>1</td><td>265061.79</td><td class="perf-good">0%</td></tr>
-                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><strong>188508.83</strong></td><td class="perf-neutral"><strong>-9.9%</strong></td></tr>
-                                <tr><td>CUTLASS (Closed EP)</td><td>4</td><td>1</td><td>209314.52</td><td class="perf-neutral">0%</td></tr>
-                                <tr><td><strong>CUTLASS (Open EP)</strong></td><td><strong>2</strong></td><td><strong>2</strong></td><td><strong>211976.65</strong></td><td class="perf-neutral"><strong>-7.0%</strong></td></tr>
-                                <tr><td>CUTLASS (Closed EP)</td><td>2</td><td>1</td><td>227963.58</td><td class="perf-neutral">0%</td></tr>
-                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>8</strong></td><td><strong>8</strong></td><td><strong>267898.03</strong></td><td class="perf-bad"><strong>+15.5%</strong></td></tr>
-                                <tr><td>TRTLLM (Closed EP)</td><td>8</td><td>1</td><td>231924.01</td><td class="perf-bad">0%</td></tr>
-                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><strong>217835.41</strong></td><td class="perf-bad"><strong>+14.0%</strong></td></tr>
-                                <tr><td>TRTLLM (Closed EP)</td><td>4</td><td>1</td><td>191022.23</td><td class="perf-bad">0%</td></tr>
-                                <tr><td><strong>TRTLLM (Open EP)</strong></td><td><strong>2</strong></td><td><strong>2</strong></td><td><strong>229135.21</strong></td><td class="perf-bad"><strong>+4.7%</strong></td></tr>
-                                <tr><td>TRTLLM (Closed EP)</td><td>2</td><td>1</td><td>218822.20</td><td class="perf-bad">0%</td></tr>
-                            </tbody>
-                        </table>
-                    </div> -->
 
                     <!-- Multi-Model 8 GPU Comparison Section -->
                     <div style="margin-top: 60px; border: 1px solid #5E5CE6; background: rgba(94,92,230,0.05); padding: 40px; border-radius: 16px;">
@@ -2060,119 +1709,6 @@ trtllm-bench \
                                 <canvas id="random-8gpu-perfect-router-chart"></canvas>
                             </div>
                         </div>
-
-                        <!-- <div style="overflow-x: auto; margin-top: 30px;">
-                            <h3>Detailed Performance Data (8 GPUs, TP=8, EP=8)</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Model</th>
-                                        <th>Backend</th>
-                                        <th>Router</th>
-                                        <th>Throughput (tok/s/gpu)</th>
-                                        <th>Total Latency (ms)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="highlight" style="background: rgba(16, 185, 129, 0.15);">
-                                        <td><strong>GPT-OSS-120B</strong></td>
-                                        <td><strong>CUTLASS</strong></td>
-                                        <td><strong>Default</strong></td>
-                                        <td class="perf-good"><strong>19,355</strong></td>
-                                        <td>203,157</td>
-                                    </tr>
-                                    <tr>
-                                        <td>GPT-OSS-120B</td>
-                                        <td>CUTLASS</td>
-                                        <td>Round Robin</td>
-                                        <td class="perf-good">23,696</td>
-                                        <td>165,942</td>
-                                    </tr>
-                                    <tr>
-                                        <td>GPT-OSS-120B</td>
-                                        <td>TRT-LLM</td>
-                                        <td>Default</td>
-                                        <td>14,678</td>
-                                        <td>267,898</td>
-                                    </tr>
-                                    <tr>
-                                        <td>GPT-OSS-120B</td>
-                                        <td>TRT-LLM</td>
-                                        <td>Round Robin</td>
-                                        <td>17,665</td>
-                                        <td>222,592</td>
-                                    </tr>
-                                    <tr class="highlight" style="background: rgba(245, 158, 11, 0.15);">
-                                        <td><strong>Qwen3-235B-A22B</strong></td>
-                                        <td><strong>CUTLASS</strong></td>
-                                        <td><strong>Default</strong></td>
-                                        <td class="perf-neutral"><strong>2,897</strong></td>
-                                        <td>1,357,350</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Qwen3-235B-A22B</td>
-                                        <td>CUTLASS</td>
-                                        <td>Round Robin</td>
-                                        <td class="perf-neutral">3,219</td>
-                                        <td>1,221,393</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Qwen3-235B-A22B</td>
-                                        <td>TRT-LLM</td>
-                                        <td>Default</td>
-                                        <td>2,851</td>
-                                        <td>1,379,004</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Qwen3-235B-A22B</td>
-                                        <td>TRT-LLM</td>
-                                        <td>Round Robin</td>
-                                        <td>3,188</td>
-                                        <td>1,233,305</td>
-                                    </tr>
-                                    <tr class="highlight" style="background: rgba(239, 68, 68, 0.15);">
-                                        <td><strong>DeepSeek-V3</strong></td>
-                                        <td><strong>DeepGeMM</strong></td>
-                                        <td><strong>Default</strong></td>
-                                        <td class="perf-neutral"><strong>2,598</strong></td>
-                                        <td>1,513,529</td>
-                                    </tr>
-                                    <tr>
-                                        <td>DeepSeek-V3</td>
-                                        <td>DeepGeMM</td>
-                                        <td>Round Robin</td>
-                                        <td class="perf-neutral">3,081</td>
-                                        <td>1,276,345</td>
-                                    </tr>
-                                    <tr class="highlight" style="background: rgba(168, 85, 247, 0.15);">
-                                        <td><strong>DeepSeek-R1</strong></td>
-                                        <td><strong>DeepGeMM</strong></td>
-                                        <td><strong>Default</strong></td>
-                                        <td class="perf-neutral"><strong>2,586</strong></td>
-                                        <td>1,520,385</td>
-                                    </tr>
-                                    <tr>
-                                        <td>DeepSeek-R1</td>
-                                        <td>DeepGeMM</td>
-                                        <td>Round Robin</td>
-                                        <td class="perf-neutral">3,107</td>
-                                        <td>1,265,684</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> -->
-
-                        <!-- <div style="margin-top: 30px; padding: 20px; background: rgba(94,92,230,0.08); border-radius: 12px; border-left: 4px solid #5E5CE6;">
-                            <h4 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.1rem;">💡 Key Observations</h4>
-                            <ul style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
-                                <li><strong>GPT-OSS-120B dominates</strong>: Achieves 7.5x higher throughput than DeepSeek models with W4A8 quantization</li>
-                                <li><strong>CUTLASS vs TRT-LLM</strong>: CUTLASS shows significant advantage for GPT-OSS-120B (+31.9%), but minimal difference for Qwen3 (+1.6%)</li>
-                                <li><strong>Model size impact</strong>: Larger models (DeepSeek 671B, Qwen 235B) show dramatically lower per-GPU throughput vs GPT-OSS-120B (120B)</li>
-                                <li><strong>Quantified Efficiency Gap</strong>: Comparing against Round Robin reveals a <strong>11-20% throughput gap</strong> for learned routers relative to ideal load balance, with DeepSeek-R1 showing the largest deficit (20.1%)</li>
-                                <li><strong>DeepGeMM backend</strong>: Required for ultra-large models (DeepSeek), performs comparably to CUTLASS/TRT-LLM for similar-sized models</li>
-                            </ul>
-                        </div> -->
-
                     </div>
                 </div>
             </div>
@@ -2180,58 +1716,6 @@ trtllm-bench \
 
         <!-- openMath Dataset Content -->
         <div id="openmath-content" class="dataset-content">
-            <!-- Hero Results for openMath Dataset -->
-            <!-- <div class="hero-results">
-                <div class="result-card winner">
-                    <h3>
-                        nvidia/openMath Dataset
-                        <span class="winner-badge">Math Reasoning</span>
-                    </h3>
-                    <div class="result-metric">
-                        <span class="metric-label">Dataset Type</span>
-                        <span class="metric-value">Math Problems (8k Output)</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Max New Tokens</span>
-                        <span class="metric-value highlight">8192 (GPT-OSS-120B)</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Best Model (8 GPU)</span>
-                        <span class="metric-value highlight">GPT-OSS-120B: 32,565 tok/s/gpu</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Best Backend</span>
-                        <span class="metric-value">CUTLASS (W4A8 Quantization)</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Max Batch Size Per GPU</span>
-                        <span class="metric-value">640</span>
-                    </div>
-                </div>
-
-                <div class="result-card">
-                    <h3>
-                        ⚡ Round Robin Impact
-                        <span class="winner-badge">Load Balance Analysis</span>
-                    </h3>
-                    <div class="result-metric">
-                        <span class="metric-label">GPT-OSS (8 GPU, CUTLASS)</span>
-                        <span class="metric-value" style="color: #10b981;">+9.4% with Round Robin</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">GPT-OSS (8 GPU, TRT-LLM)</span>
-                        <span class="metric-value" style="color: #10b981;">+11.1% with Round Robin</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">DeepSeek-V3 (8 GPU)</span>
-                        <span class="metric-value" style="color: #10b981;">+6.4% with Round Robin</span>
-                    </div>
-                    <div class="result-metric">
-                        <span class="metric-label">Qwen3-235B (8 GPU)</span>
-                        <span class="metric-value" style="color: #10b981;">+7.2% with Round Robin</span>
-                    </div>
-                </div>
-            </div> -->
 
             <!-- openMath Charts and Analysis -->
             <div class="section">
@@ -2311,274 +1795,6 @@ trtllm-bench \
 
                 <!-- Performance Tables -->
                 <div style="overflow-x: auto; margin-top: 30px;">
-                    <!-- <h3>GPT-OSS-120B Detailed Performance (nvidia/openMath Dataset)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>GPUs</th>
-                                <th>MoE Backend</th>
-                                <th>Router Type</th>
-                                <th>Throughput (tok/s/gpu)</th>
-                                <th>Total Latency (ms)</th>
-                                <th>Throughput Gap</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>CUTLASS</td>
-                                <td>Round Robin</td>
-                                <td class="perf-good">24,221</td>
-                                <td>162,346</td>
-                                <td class="perf-good">0% (Ideal)</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CUTLASS</td>
-                                <td>Default</td>
-                                <td>24,889</td>
-                                <td>157,986</td>
-                                <td class="perf-good">+2.8%</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>CUTLASS</td>
-                                <td>Round Robin</td>
-                                <td class="perf-good">29,646</td>
-                                <td>132,639</td>
-                                <td class="perf-good">0% (Ideal)</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>CUTLASS</td>
-                                <td>Default</td>
-                                <td>27,839</td>
-                                <td>141,247</td>
-                                <td class="perf-neutral">-6.1%</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>4</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td class="perf-good"><strong>31,206</strong></td>
-                                <td><strong>126,008</strong></td>
-                                <td class="perf-good"><strong>0% (Ideal)</strong></td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>CUTLASS</td>
-                                <td>Default</td>
-                                <td>28,500</td>
-                                <td>137,970</td>
-                                <td class="perf-neutral">-8.7%</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>8</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td class="perf-good"><strong>32,565</strong></td>
-                                <td><strong>120,749</strong></td>
-                                <td class="perf-good"><strong>0% (Ideal)</strong></td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>CUTLASS</td>
-                                <td>Default</td>
-                                <td>29,757</td>
-                                <td>132,142</td>
-                                <td class="perf-bad">-8.6%</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>TRT-LLM</td>
-                                <td>Round Robin</td>
-                                <td class="perf-neutral">24,067</td>
-                                <td>163,387</td>
-                                <td class="perf-good">0% (Ideal)</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>TRT-LLM</td>
-                                <td>Default</td>
-                                <td>22,656</td>
-                                <td>173,561</td>
-                                <td class="perf-neutral">-5.9%</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>TRT-LLM</td>
-                                <td>Round Robin</td>
-                                <td class="perf-neutral">28,824</td>
-                                <td>136,420</td>
-                                <td class="perf-good">0% (Ideal)</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>TRT-LLM</td>
-                                <td>Default</td>
-                                <td>27,018</td>
-                                <td>145,538</td>
-                                <td class="perf-neutral">-6.3%</td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>TRT-LLM</td>
-                                <td>Round Robin</td>
-                                <td class="perf-neutral">26,630</td>
-                                <td>147,660</td>
-                                <td class="perf-good">0% (Ideal)</td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>TRT-LLM</td>
-                                <td>Default</td>
-                                <td>25,387</td>
-                                <td>154,886</td>
-                                <td class="perf-neutral">-4.7%</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>TRT-LLM</td>
-                                <td>Round Robin</td>
-                                <td class="perf-neutral">24,967</td>
-                                <td>157,492</td>
-                                <td class="perf-good">0% (Ideal)</td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td>TRT-LLM</td>
-                                <td>Default</td>
-                                <td>22,467</td>
-                                <td>175,017</td>
-                                <td class="perf-bad">-10.0%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h3 style="margin-top: 60px;">Multi-Model Comparison (8 GPUs, nvidia/openMath)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Model</th>
-                                <th>Backend</th>
-                                <th>Router Type</th>
-                                <th>Max Tokens</th>
-                                <th>Throughput (tok/s/gpu)</th>
-                                <th>Total Latency (ms)</th>
-                                <th>Quantization</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="highlight" style="background: rgba(16, 185, 129, 0.15);">
-                                <td><strong>GPT-OSS-120B</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td><strong>8192</strong></td>
-                                <td class="perf-good"><strong>32,565</strong></td>
-                                <td>120,749</td>
-                                <td>W4A8_MXFP4_MXFP8</td>
-                            </tr>
-                            <tr>
-                                <td>GPT-OSS-120B</td>
-                                <td>CUTLASS</td>
-                                <td>Default</td>
-                                <td>8192</td>
-                                <td>29,757</td>
-                                <td>132,142</td>
-                                <td>W4A8_MXFP4_MXFP8</td>
-                            </tr>
-                            <tr>
-                                <td>GPT-OSS-120B</td>
-                                <td>TRT-LLM</td>
-                                <td>Round Robin</td>
-                                <td>8192</td>
-                                <td>24,967</td>
-                                <td>157,492</td>
-                                <td>W4A8_MXFP4_MXFP8</td>
-                            </tr>
-                            <tr>
-                                <td>GPT-OSS-120B</td>
-                                <td>TRT-LLM</td>
-                                <td>Default</td>
-                                <td>8192</td>
-                                <td>22,467</td>
-                                <td>175,017</td>
-                                <td>W4A8_MXFP4_MXFP8</td>
-                            </tr>
-                            <tr class="highlight" style="background: rgba(239, 68, 68, 0.15);">
-                                <td><strong>DeepSeek-V3</strong></td>
-                                <td><strong>DeepGeMM</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td><strong>2048</strong></td>
-                                <td class="perf-neutral"><strong>5,154</strong></td>
-                                <td>763,005</td>
-                                <td>FP8_BLOCK_SCALES</td>
-                            </tr>
-                            <tr>
-                                <td>DeepSeek-V3</td>
-                                <td>DeepGeMM</td>
-                                <td>Default</td>
-                                <td>2048</td>
-                                <td>4,844</td>
-                                <td>763,005</td>
-                                <td>FP8_BLOCK_SCALES</td>
-                            </tr>
-                            <tr class="highlight" style="background: rgba(168, 85, 247, 0.15);">
-                                <td><strong>DeepSeek-R1</strong></td>
-                                <td><strong>DeepGeMM</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td><strong>2048</strong></td>
-                                <td class="perf-neutral"><strong>5,124</strong></td>
-                                <td>767,473</td>
-                                <td>FP8_BLOCK_SCALES</td>
-                            </tr>
-                            <tr>
-                                <td>DeepSeek-R1</td>
-                                <td>DeepGeMM</td>
-                                <td>Default</td>
-                                <td>2048</td>
-                                <td>4,802</td>
-                                <td>818,796</td>
-                                <td>FP8_BLOCK_SCALES</td>
-                            </tr>
-                            <tr class="highlight" style="background: rgba(245, 158, 11, 0.15);">
-                                <td><strong>Qwen3-235B-A22B</strong></td>
-                                <td><strong>CUTLASS</strong></td>
-                                <td><strong>Round Robin</strong></td>
-                                <td><strong>2048</strong></td>
-                                <td class="perf-neutral"><strong>5,063</strong></td>
-                                <td>776,678</td>
-                                <td>N/A</td>
-                            </tr>
-                            <tr>
-                                <td>Qwen3-235B-A22B</td>
-                                <td>CUTLASS</td>
-                                <td>Default</td>
-                                <td>2048</td>
-                                <td>4,723</td>
-                                <td>832,554</td>
-                                <td>N/A</td>
-                            </tr>
-                            <tr>
-                                <td>Qwen3-235B-A22B</td>
-                                <td>TRT-LLM</td>
-                                <td>Round Robin</td>
-                                <td>2048</td>
-                                <td>5,059</td>
-                                <td>777,266</td>
-                                <td>N/A</td>
-                            </tr>
-                            <tr>
-                                <td>Qwen3-235B-A22B</td>
-                                <td>TRT-LLM</td>
-                                <td>Default</td>
-                                <td>2048</td>
-                                <td>4,724</td>
-                                <td>832,398</td>
-                                <td>N/A</td>
-                            </tr>
-                        </tbody>
-                    </table> -->
 
                 </div>
             </div>
@@ -2755,156 +1971,6 @@ trtllm-bench \
                 }
             };
 
-            // GSM8K Latency Chart
-            const gsm8kLatencyCtx = document.getElementById('gsm8k-latency-chart');
-            if (gsm8kLatencyCtx) {
-                const gsm8kLatencyOptions = JSON.parse(JSON.stringify(commonOptions));
-                gsm8kLatencyOptions.scales.y.title.text = 'Total Latency (s) - Lower is Better';
-                
-                new Chart(gsm8kLatencyCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['1', '2', '4', '8'],
-                        datasets: [
-                            {
-                                label: 'CUTLASS Ideal',
-                                // added 1-GPU result (7871.9037 ms -> 7.8719 s)
-                                data: [7.8719, 8.65, 14.68, 7.90],
-                                borderColor: '#10b981',
-                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                borderWidth: 3,
-                                borderDash: [8, 4],
-                                tension: 0.2,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#10b981',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            },
-                            {
-                                label: 'CUTLASS Actual',
-                                // added 1-GPU result (8251.961 ms -> 8.2520 s)
-                                data: [8.2520, 8.78, 15.00, 8.53],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                borderWidth: 3,
-                                tension: 0.2,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#f59e0b',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            },
-                            {
-                                label: 'TRTLLM Ideal',
-                                // added 1-GPU result (7727.1298 ms -> 7.7271 s)
-                                data: [7.7271, 8.69, 14.75, 9.44],
-                                borderColor: '#60a5fa',
-                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
-                                borderWidth: 3,
-                                borderDash: [8, 4],
-                                tension: 0.2,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#60a5fa',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            },
-                            {
-                                label: 'TRTLLM Actual',
-                                // added 1-GPU result (7593.6004 ms -> 7.5936 s)
-                                data: [7.5936, 8.86, 15.22, 10.59],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                borderWidth: 3,
-                                tension: 0.2,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#ef4444',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            }
-                        ]
-                    },
-                    options: gsm8kLatencyOptions
-                });
-            }
-
-            // GSM8K Throughput Chart
-            const gsm8kThroughputCtx = document.getElementById('gsm8k-throughput-chart');
-            if (gsm8kThroughputCtx) {
-                const gsm8kThroughputOptions = JSON.parse(JSON.stringify(commonOptions));
-                gsm8kThroughputOptions.scales.y.title.text = 'Throughput (tokens/s/GPU) - Higher is Better';
-                
-                new Chart(gsm8kThroughputCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['1', '2', '4', '8'],
-                        datasets: [
-                            {
-                                label: 'CUTLASS Ideal',
-                                // added 1-GPU result: 18304.34 tok/s/gpu
-                                data: [18304.34, 14437.10, 15968.47, 11553.53],
-                                borderColor: '#10b981',
-                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                borderWidth: 3,
-                                borderDash: [8, 4],
-                                tension: 0.2,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#10b981',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            },
-                            {
-                                label: 'CUTLASS Actual',
-                                // added 1-GPU result: 17461.30 tok/s/gpu
-                                data: [17461.30, 14216.19, 15622.13, 10699.03],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                borderWidth: 3,
-                                tension: 0.2,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#f59e0b',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            },
-                            {
-                                label: 'TRTLLM Ideal',
-                                // added 1-GPU result: 18647.29 tok/s/gpu
-                                data: [18647.29, 14377.10, 15886.68, 9666.57],
-                                borderColor: '#60a5fa',
-                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
-                                borderWidth: 3,
-                                borderDash: [8, 4],
-                                tension: 0.2,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#60a5fa',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            },
-                            {
-                                label: 'TRTLLM Actual',
-                                // added 1-GPU result: 18975.19 tok/s/gpu
-                                data: [18975.19, 14098.34, 15397.04, 8616.56],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                borderWidth: 3,
-                                tension: 0.2,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#ef4444',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2
-                            }
-                        ]
-                    },
-                    options: gsm8kThroughputOptions
-                });
-            }
-
             // ShareGPT Model Comparison Chart (8 GPUs)
             const sharegptModelComparisonCtx = document.getElementById('sharegpt-model-comparison-chart');
             if (sharegptModelComparisonCtx) {
@@ -3034,13 +2100,13 @@ trtllm-bench \
                             {
                                 label: 'CUTLASS Actual',
                                 data: [15389, 18783, 21768, 22051],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                 borderWidth: 3,
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#f59e0b',
+                                pointBackgroundColor: '#10b981',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             },
@@ -3061,13 +2127,13 @@ trtllm-bench \
                             {
                                 label: 'TRT-LLM Actual',
                                 data: [14093, 17595, 18958, 16425],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
                                 borderWidth: 3,
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#ef4444',
+                                pointBackgroundColor: '#60a5fa',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             }
@@ -3105,13 +2171,13 @@ trtllm-bench \
                             {
                                 label: 'CUTLASS Actual',
                                 data: [255.52, 209.35, 180.64, 178.32],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                 borderWidth: 3,
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#f59e0b',
+                                pointBackgroundColor: '#10b981',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             },
@@ -3132,13 +2198,13 @@ trtllm-bench \
                             {
                                 label: 'TRT-LLM Actual',
                                 data: [279.01, 223.48, 207.42, 239.40],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
                                 borderWidth: 3,
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#ef4444',
+                                pointBackgroundColor: '#60a5fa',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             }
@@ -3177,13 +2243,13 @@ trtllm-bench \
                             {
                                 label: 'CUTLASS Actual',
                                 data: [15795, 18550, 20859, 19355],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                 borderWidth: 3,
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#f59e0b',
+                                pointBackgroundColor: '#10b981',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             },
@@ -3204,13 +2270,13 @@ trtllm-bench \
                             {
                                 label: 'TRTLLM Actual',
                                 data: [14256, 17161, 18051, 14678],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
                                 borderWidth: 3,
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#ef4444',
+                                pointBackgroundColor: '#60a5fa',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             }
@@ -3249,13 +2315,13 @@ trtllm-bench \
                             {
                                 label: 'CUTLASS Actual',
                                 data: [248.956, 211.977, 188.509, 188.509],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                 borderWidth: 3,
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#f59e0b',
+                                pointBackgroundColor: '#10b981',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             },
@@ -3276,13 +2342,13 @@ trtllm-bench \
                             {
                                 label: 'TRTLLM Actual',
                                 data: [275.824, 229.135, 217.835, 217.835],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
                                 borderWidth: 3,
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#ef4444',
+                                pointBackgroundColor: '#60a5fa',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             }
@@ -3365,14 +2431,14 @@ trtllm-bench \
                             {
                                 label: 'CUTLASS (Default Router)',
                                 data: [16667.98, 20244.72, 21015.80, 19358.87],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                 borderWidth: 3,
                                 borderDash: [5, 5],
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#f59e0b',
+                                pointBackgroundColor: '#10b981',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             },
@@ -3392,14 +2458,14 @@ trtllm-bench \
                             {
                                 label: 'TRTLLM (Default Router)',
                                 data: [null, 18347.52, 18161.90, 14535.98],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
                                 borderWidth: 3,
                                 borderDash: [5, 5],
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#ef4444',
+                                pointBackgroundColor: '#60a5fa',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             }
@@ -3634,14 +2700,14 @@ trtllm-bench \
                             {
                                 label: 'CUTLASS (Default)',
                                 data: [24889, 27839, 28500, 29757],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                 borderWidth: 3,
                                 borderDash: [5, 5],
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#f59e0b',
+                                pointBackgroundColor: '#10b981',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             },
@@ -3661,14 +2727,14 @@ trtllm-bench \
                             {
                                 label: 'TRT-LLM (Default)',
                                 data: [22656, 27018, 25387, 22467],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
                                 borderWidth: 3,
                                 borderDash: [5, 5],
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#ef4444',
+                                pointBackgroundColor: '#60a5fa',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             }
@@ -3705,14 +2771,14 @@ trtllm-bench \
                             {
                                 label: 'CUTLASS (Default)',
                                 data: [157986, 141247, 137970, 132142],
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                 borderWidth: 3,
                                 borderDash: [5, 5],
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#f59e0b',
+                                pointBackgroundColor: '#10b981',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             },
@@ -3732,14 +2798,14 @@ trtllm-bench \
                             {
                                 label: 'TRT-LLM (Default)',
                                 data: [173561, 145538, 154886, 175017],
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.1)',
                                 borderWidth: 3,
                                 borderDash: [5, 5],
                                 tension: 0.2,
                                 pointRadius: 6,
                                 pointHoverRadius: 9,
-                                pointBackgroundColor: '#ef4444',
+                                pointBackgroundColor: '#60a5fa',
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2
                             }
