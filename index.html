@@ -1046,8 +1046,11 @@ trtllm-bench \
                 Random Dataset(1k/2k)
             </button>
 
-            <button class="tab-button" onclick="switchDataset('sharegpt')">
+            <!-- <button class="tab-button" onclick="switchDataset('sharegpt')">
                 OpenGVLab/ShareGPT-4o
+            </button> -->
+            <button class="tab-button" onclick="switchDataset('sharegpt')">
+                ShareGPT
             </button>
             <button class="tab-button" onclick="switchDataset('openmath')">
                 nvidia/OpenMathInstruct-1
@@ -1080,7 +1083,7 @@ trtllm-bench \
                         <div class="regime-card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%);">
                             <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token. In our benchmark we keep the work per GPU fixed (640 active sequences per GPU), so the only thing that really changes is <strong>how quickly each GPU can finish a decode step</strong>.
+                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token. In our benchmark we keep the work per GPU fixed, so the only thing that really changes is <strong>how quickly each GPU can finish a decode step</strong>.
                             </p>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
                                 At 1 GPU the step is dominated by waiting for weights to arrive from memory; as we add more GPUs, we effectively <strong>aggregate HBM bandwidth</strong> and chip away at that memory stall. The step latency per GPU goes down almost in proportion to the number of GPUs, so per-GPU throughput climbs nearly linearly from 1 → 4. Total cluster throughput even looks super-linear, because you have more GPUs and each GPU is also running faster.
@@ -1088,13 +1091,14 @@ trtllm-bench \
                         </div>
 
                         <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
-                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
+                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(Diminishing Returns)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                This nice trend breaks at 8 GPUs. By that point, the memory wait time is already very small, so further slicing the model does not help much. Instead, <strong>two new effects start to dominate</strong>.
+                                However, <strong>more GPUs does not always mean better performance</strong>. At some point, the memory wait time is already very small, so further slicing the model yields diminishing returns. Instead, <strong>two new effects start to dominate</strong>:
                             </p>
-                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
-                                The learned router no longer keeps the load perfectly balanced: some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization.
-                            </p>
+                            <ul style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.8; margin: 0 0 15px 20px; padding: 0;">
+                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">MoE Load Imbalance:</strong> The learned router no longer keeps the load perfectly balanced—some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.</li>
+                                <li><strong style="color: #f59e0b;">Tensor Parallel Communication Overhead:</strong> As the number of GPUs increases, each decode step requires more AllReduce operations across more participants. The communication latency grows with the parallelism degree, and this overhead becomes non-negligible when compute time per step is already small.</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -1246,7 +1250,7 @@ trtllm-bench \
                         <div class="regime-card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%);">
                             <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token. In our benchmark we keep the work per GPU fixed (640 active sequences per GPU), so the only thing that really changes is <strong>how quickly each GPU can finish a decode step</strong>.
+                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token.
                             </p>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
                                 At 1 GPU the step is dominated by waiting for weights to arrive from memory; as we add more GPUs, we effectively <strong>aggregate HBM bandwidth</strong> and chip away at that memory stall. The step latency per GPU goes down almost in proportion to the number of GPUs, so per-GPU throughput climbs nearly linearly from 1 → 4. Total cluster throughput even looks super-linear, because you have more GPUs and each GPU is also running faster.
@@ -1254,13 +1258,14 @@ trtllm-bench \
                         </div>
 
                         <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
-                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
+                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(Diminishing Returns)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                This nice trend breaks at 8 GPUs. By that point, the memory wait time is already very small, so further slicing the model does not help much. Instead, <strong>two new effects start to dominate</strong>.
+                                However, <strong>more GPUs does not always mean better performance</strong>. At some point, the memory wait time is already very small, so further slicing the model yields diminishing returns. Instead, <strong>two new effects start to dominate</strong>:
                             </p>
-                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
-                                The learned router no longer keeps the load perfectly balanced: some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.
-                            </p>
+                            <ul style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.8; margin: 0 0 15px 20px; padding: 0;">
+                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">MoE Load Imbalance:</strong> The learned router no longer keeps the load perfectly balanced—some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.</li>
+                                <li><strong style="color: #f59e0b;">Tensor Parallel Communication Overhead:</strong> As the number of GPUs increases, each decode step requires more AllReduce operations across more participants. The communication latency grows with the parallelism degree, and this overhead becomes non-negligible when compute time per step is already small.</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -1476,7 +1481,7 @@ trtllm-bench \
                         <div class="regime-card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(0,0,0,0) 100%);">
                             <h4 style="color: #10b981; margin-bottom: 15px; font-size: 1.1rem;">Phase I: The Memory Wall Breakout<br><span style="font-size: 0.85rem; opacity: 0.8;">(1 → 4 GPUs)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token. In our benchmark we keep the work per GPU fixed (640 active sequences per GPU), so the only thing that really changes is <strong>how quickly each GPU can finish a decode step</strong>.
+                                From 1 to 4 GPUs, we increase the TP/EP size and slice the 120B MoE model across more devices. Each GPU now holds only a fraction of the experts, so it needs to move <strong>much less weight data from HBM</strong> for each token. In our benchmark we keep the work per GPU fixed, so the only thing that really changes is <strong>how quickly each GPU can finish a decode step</strong>.
                             </p>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
                                 At 1 GPU the step is dominated by waiting for weights to arrive from memory; as we add more GPUs, we effectively <strong>aggregate HBM bandwidth</strong> and chip away at that memory stall. The step latency per GPU goes down almost in proportion to the number of GPUs, so per-GPU throughput climbs nearly linearly from 1 → 4. Total cluster throughput even looks super-linear, because you have more GPUs and each GPU is also running faster.
@@ -1484,13 +1489,14 @@ trtllm-bench \
                         </div>
 
                         <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
-                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(N = 8 GPUs)</span></h4>
+                            <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(Diminishing Returns)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                This nice trend breaks at 8 GPUs. By that point, the memory wait time is already very small, so further slicing the model does not help much. Instead, <strong>two new effects start to dominate</strong>.
+                                However, <strong>more GPUs does not always mean better performance</strong>. At some point, the memory wait time is already very small, so further slicing the model yields diminishing returns. Instead, <strong>two new effects start to dominate</strong>:
                             </p>
-                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7;">
-                                The learned router no longer keeps the load perfectly balanced: some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.
-                            </p>
+                            <ul style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.8; margin: 0 0 15px 20px; padding: 0;">
+                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">MoE Load Imbalance:</strong> The learned router no longer keeps the load perfectly balanced—some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.</li>
+                                <li><strong style="color: #f59e0b;">Tensor Parallel Communication Overhead:</strong> As the number of GPUs increases, each decode step requires more AllReduce operations across more participants. The communication latency grows with the parallelism degree, and this overhead becomes non-negligible when compute time per step is already small.</li>
+                            </ul>
                         </div>
                     </div>
 
