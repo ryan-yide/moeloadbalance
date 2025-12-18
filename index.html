@@ -1550,7 +1550,7 @@ trtllm-bench \
                     <div class="insight-section-group">
                         <h4 class="insight-subsection-title">Why B200 is impacted less by MoE load imbalance</h4>
                         <ul class="insight-list">
-                            <li><strong>Conclusion:</strong> B200 reduces the relative throughput penalty from MoE stragglers (vs earlier GPUs).</li>
+                            <!-- <li><strong>Conclusion:</strong> B200 reduces the relative throughput penalty from MoE stragglers (vs earlier GPUs).</li> -->
                             <li><strong>Mechanism:</strong> imbalance → stragglers → synchronization waiting (All-to-All + barriers) → efficiency gap.</li>
                             <li><strong>Reason on B200:</strong> higher NVLink + higher HBM bandwidth/capacity reduces comm/weight-move fraction, so waiting is a smaller % of the step.</li>
                         </ul>
@@ -1716,6 +1716,12 @@ trtllm-bench \
                             <canvas id="load-imbalance-gap-chart"></canvas>
                         </div>
 
+                        <div style="background: rgba(71, 85, 105, 0.15); border-left: 4px solid #94a3b8; padding: 14px 18px; border-radius: 8px; margin-top: 15px;">
+                            <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin: 0; font-style: italic;">
+                                <strong style="color: #cbd5e1;">Note:</strong> We do not include A100 results here because the SM80 architecture (A100) does not support the unified W4A8_MXFP4_MXFP8 / W4A16 quantization formats used by the GPT-OSS-120B MoE model.
+                            </p>
+                        </div>
+
                         <!-- <div style="background: rgba(94,92,230,0.08); border-left: 4px solid #5E5CE6; padding: 16px 20px; border-radius: 8px; margin-top: 20px;">
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin: 0;">
                                 <strong style="color: #60a5fa;">Key:</strong> B200 delivers 7–14× higher throughput. Load imbalance impact is larger on H100 (~35-55% gap) vs B200 (~7-18% gap).
@@ -1725,10 +1731,31 @@ trtllm-bench \
                     </div>
                     
                     <div class="insight-section-group">
-                        <h4 class="insight-subsection-title">What works well on B200</h4>
+                        <!-- <h4 class="insight-subsection-title">What works well on B200</h4> -->
                         <ul class="insight-list">
                             <!-- <li><strong>CUTLASS + Open EP:</strong> Consistently delivers the best throughput for GPT-OSS-120B, outperforming TRT-LLM.</li> -->
-                            <li><strong>Linear Scaling (1→4 GPUs):</strong> The system stays in the "Memory-Wall Breakout" regime. Aggregating HBM and NVLink yields near-linear per-GPU gains.</li>
+                            <!-- <li><strong>Linear Scaling (1→4 GPUs):</strong> The system stays in the "Memory-Wall Breakout" regime. Aggregating HBM and NVLink yields near-linear per-GPU gains.</li> -->
+                            <!-- <li>
+                            <strong>Training-time mitigation has limits:</strong>
+                            Pretraining can encourage balance—e.g., Qwen3 adopts a <strong>global-batch load balancing loss</strong> [3],
+                            and DeepSeek-V3 uses an <strong>auxiliary-loss-free</strong> bias-based balancing mechanism to keep experts balanced during training [4].
+                            However, <strong>in real inference workloads</strong>, we still observe straggler-driven imbalance (and thus throughput gaps)
+                            that cannot be fully eliminated by training-only objectives, motivating runtime measurement and mitigation.
+
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(139, 92, 246, 0.2); font-size: 0.85rem; color: #94a3b8; line-height: 1.6;">
+                                <strong style="color: #8b5cf6;">References:</strong><br>
+                                [3] Qwen Team, et al. (2025). <em>"Qwen3 Technical Report."</em> arXiv:2505.09388. <a href="https://arxiv.org/pdf/2505.09388" target="_blank" rel="noopener" style="color:#60a5fa; text-decoration:none;">PDF</a><br>
+                                [4] DeepSeek-AI, et al. (2024). <em>"DeepSeek-V3 Technical Report."</em> arXiv:2412.19437. <a href="https://arxiv.org/pdf/2412.19437" target="_blank" rel="noopener" style="color:#60a5fa; text-decoration:none;">PDF</a>
+                            </div>
+                            </li> -->
+                        </ul>
+                    </div>
+                    
+                    <div class="insight-section-group">
+                        <h4 class="insight-subsection-title">Practical Mitigations</h4>
+                        <ul class="insight-list">
+                            <li><strong>Speculative decoding–based expert prefetch</strong>: use a lightweight drafter to predict token‑to‑expert routes, prefetch the top‑k “hot” experts ahead of verification, and cap overfetch with a cutoff policy.</li>
+                            <li><strong>Capacity-aware routing (overflow control)</strong>: enforce per-expert/per-rank token capacity during routing; when an expert is overloaded, spill overflow tokens to backup experts (or lower-ranked top-k candidates) to prevent worst-case synchronization stalls.</li>
                             <li>
                             <strong>Training-time mitigation has limits:</strong>
                             Pretraining can encourage balance—e.g., Qwen3 adopts a <strong>global-batch load balancing loss</strong> [3],
@@ -1742,14 +1769,6 @@ trtllm-bench \
                                 [4] DeepSeek-AI, et al. (2024). <em>"DeepSeek-V3 Technical Report."</em> arXiv:2412.19437. <a href="https://arxiv.org/pdf/2412.19437" target="_blank" rel="noopener" style="color:#60a5fa; text-decoration:none;">PDF</a>
                             </div>
                             </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="insight-section-group">
-                        <h4 class="insight-subsection-title">Practical Mitigations</h4>
-                        <ul class="insight-list">
-                            <li><strong>Speculative decoding–based expert prefetch</strong>: use a lightweight drafter to predict token‑to‑expert routes, prefetch the top‑k “hot” experts ahead of verification, and cap overfetch with a cutoff policy.</li>
-                            <li><strong>Capacity-aware routing (overflow control)</strong>: enforce per-expert/per-rank token capacity during routing; when an expert is overloaded, spill overflow tokens to backup experts (or lower-ranked top-k candidates) to prevent worst-case synchronization stalls.</li>
                         </ul>
                     </div>
                 </div>
