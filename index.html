@@ -1124,7 +1124,7 @@ trtllm-bench \
                     </div>
                 </div>
                 
-                <div style="overflow-x: auto; margin-top: 30px;">
+                <!-- <div style="overflow-x: auto; margin-top: 30px;">
                     <h3>Throughput Performance (GPT-OSS-120B on ShareGPT)</h3>
                     <table>
                         <thead>
@@ -1204,7 +1204,7 @@ trtllm-bench \
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -1274,7 +1274,7 @@ trtllm-bench \
                 
                 <!-- Detailed Performance Table -->
                 <div style="overflow-x: auto; margin-top: 30px;">
-                    <h3>Throughput Performance (Random Dataset)</h3>
+                    <!-- <h3>Throughput Performance (Random Dataset)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -1352,14 +1352,13 @@ trtllm-bench \
                                 <td class="perf-bad">-16.9%</td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table> -->
                     
                     <!-- Expert Parallelism Charts -->
                     <div style="margin-top: 60px; margin-bottom: 60px;">
-                        <h2 style="text-align: center; font-size: 2rem; margin-bottom: 40px; background: linear-gradient(135deg, #5E5CE6 0%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Expert Parallelism Analysis</h2>
+                        <!-- <h2 style="text-align: center; font-size: 2rem; margin-bottom: 40px; background: linear-gradient(135deg, #5E5CE6 0%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Expert Parallelism Analysis</h2>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
-                            <!-- Throughput Chart -->
                             <div style="background: rgba(28, 28, 30, 0.8); border: 1px solid #2C2C2E; border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
                                 <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa;">Throughput Impact(tok/gpu/s)</h3>
                                 <div style="position: relative; height: 350px;">
@@ -1370,7 +1369,6 @@ trtllm-bench \
                                 </p>
                             </div>
                             
-                            <!-- Latency Chart -->
                             <div style="background: rgba(28, 28, 30, 0.8); border: 1px solid #2C2C2E; border-radius: 16px; padding: 30px; backdrop-filter: blur(10px);">
                                 <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa;">Total Latency(ms)</h3>
                                 <div style="position: relative; height: 350px;">
@@ -1380,13 +1378,12 @@ trtllm-bench \
                                     Total latency comparison across different GPU configurations and Expert Parallelism sizes. Lower values indicate better performance.
                                 </p>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Does Closed vs Open EP make a difference? -->
-                        <div style="margin-top: 40px;">
+                        <!-- <div style="margin-top: 40px;">
                             <h2 style="text-align: center; font-size: 1.8rem; margin-bottom: 20px; color: #60a5fa;">Does Closed vs Open EP make a difference?</h2>
                             
-                            <!-- EP Explanation Box -->
                             <div style="background: rgba(94, 92, 230, 0.1); border: 1px solid rgba(94, 92, 230, 0.3); border-radius: 12px; padding: 25px; margin-bottom: 0px; max-width: 1000px; margin-left: auto; margin-right: auto;">
                                 <h3 style="color: #60a5fa; margin-bottom: 15px; font-size: 1.2rem;">Understanding Expert Parallelism (EP)</h3>
                                 <div style="display: grid; gap: 15px;">
@@ -1419,7 +1416,7 @@ trtllm-bench \
                                     </p>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- Multi-Model 8 GPU Comparison Section -->
@@ -1560,7 +1557,7 @@ trtllm-bench \
 
                         <details open style="margin-top: 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(94,92,230,0.2); border-radius: 12px; padding: 14px;">
                             <summary style="cursor:pointer; color:#60a5fa; font-weight:600; outline:none;">
-                                Evidence: B200 vs H100 vs A100 hardware context (bandwidth & comm)
+                                B200 vs H100 vs A100 hardware context (bandwidth & comm)
                             </summary>
                             <div style="margin-top: 14px;">
                                 <div class="gpu-comparison-section">
@@ -1631,6 +1628,100 @@ trtllm-bench \
                                 </div>
                             </div>
                         </details>
+                        <!-- H100 vs B200 Comparison -->
+                    <div class="insight-section-group" style="margin-top: 20px;">
+                        <h4 class="insight-subsection-title">H100 vs B200: Performance Comparison (GPT-OSS-120B, CUTLASS)</h4>
+                        <p style="color: #cbd5e1; margin-bottom: 20px; font-size: 0.95rem;">
+                            Comparing throughput per GPU (tokens/s) at 4-GPU and 8-GPU scale. B200 delivers <strong>7-14× higher throughput</strong> than H100.
+                        </p>
+                        
+                        <div style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px; border: 1px solid rgba(94,92,230,0.2); margin-bottom: 20px;">
+                            <div style="height: 380px;">
+                                <canvas id="h100-b200-comparison-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
+                                <thead>
+                                    <tr style="background: rgba(94,92,230,0.15);">
+                                        <th style="padding: 10px 12px; text-align: left; color: #60a5fa; border-bottom: 2px solid rgba(94,92,230,0.3);">Dataset</th>
+                                        <th style="padding: 10px 12px; text-align: center; color: #60a5fa; border-bottom: 2px solid rgba(94,92,230,0.3);">GPUs</th>
+                                        <th style="padding: 10px 12px; text-align: center; color: #10b981; border-bottom: 2px solid rgba(94,92,230,0.3);">B200 Perfect</th>
+                                        <th style="padding: 10px 12px; text-align: center; color: #10b981; border-bottom: 2px solid rgba(94,92,230,0.3);">B200 Default</th>
+                                        <th style="padding: 10px 12px; text-align: center; color: #f59e0b; border-bottom: 2px solid rgba(94,92,230,0.3);">H100 Perfect</th>
+                                        <th style="padding: 10px 12px; text-align: center; color: #f59e0b; border-bottom: 2px solid rgba(94,92,230,0.3);">H100 Default</th>
+                                        <th style="padding: 10px 12px; text-align: center; color: #8b5cf6; border-bottom: 2px solid rgba(94,92,230,0.3);">Speedup</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                        <td style="padding: 10px 12px; color: #cbd5e1;" rowspan="2"><strong>Random</strong></td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8E8E93;">4</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981; font-weight: 600;">23,277</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981;">20,859</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b; font-weight: 600;">3,088</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b;">2,000</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8b5cf6; font-weight: 600;">7.5× / 10.4×</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                        <td style="padding: 10px 12px; text-align: center; color: #8E8E93;">8</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981; font-weight: 600;">23,696</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981;">19,355</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b; font-weight: 600;">3,303</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b;">1,862</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8b5cf6; font-weight: 600;">7.2× / 10.4×</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                        <td style="padding: 10px 12px; color: #cbd5e1;" rowspan="2"><strong>ShareGPT</strong></td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8E8E93;">4</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981; font-weight: 600;">23,248</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981;">21,768</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b; font-weight: 600;">3,089</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b;">2,212</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8b5cf6; font-weight: 600;">7.5× / 9.8×</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                        <td style="padding: 10px 12px; text-align: center; color: #8E8E93;">8</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981; font-weight: 600;">23,702</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981;">22,051</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b; font-weight: 600;">3,310</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b;">2,361</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8b5cf6; font-weight: 600;">7.2× / 9.3×</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                        <td style="padding: 10px 12px; color: #cbd5e1;" rowspan="2"><strong>OpenMath</strong></td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8E8E93;">4</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981; font-weight: 600;">31,206</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981;">28,500</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b; font-weight: 600;">3,250</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b;">2,383</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8b5cf6; font-weight: 600;">9.6× / 12.0×</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8E8E93;">8</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981; font-weight: 600;">32,565</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #10b981;">29,757</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b; font-weight: 600;">3,280</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #f59e0b;">2,168</td>
+                                        <td style="padding: 10px 12px; text-align: center; color: #8b5cf6; font-weight: 600;">9.9× / 13.7×</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Load Imbalance Gap Chart -->
+                        <h5 style="color: #a78bfa; font-size: 1rem; margin: 25px 0 15px 0; font-weight: 600;">MoE Expert Load Imbalance Impact: B200 vs H100</h5>
+                        <div style="height: 320px; margin-bottom: 20px;">
+                            <canvas id="load-imbalance-gap-chart"></canvas>
+                        </div>
+
+                        <div style="background: rgba(94,92,230,0.08); border-left: 4px solid #5E5CE6; padding: 16px 20px; border-radius: 8px; margin-top: 20px;">
+                            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin: 0;">
+                                <strong style="color: #60a5fa;">Key:</strong> B200 delivers 7–14× higher throughput. Load imbalance impact is larger on H100 (~35-55% gap) vs B200 (~7-18% gap).
+                            </p>
+                        </div>
+                    </div>
                     </div>
                     
                     <div class="insight-section-group">
@@ -2585,6 +2676,144 @@ trtllm-bench \
                         }]
                     },
                     options: perfectRouterOptions
+                });
+            }
+
+            // ============= H100 vs B200 Comparison Chart =============
+            const h100B200Ctx = document.getElementById('h100-b200-comparison-chart');
+            if (h100B200Ctx) {
+                new Chart(h100B200Ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Random 4GPU', 'Random 8GPU', 'ShareGPT 4GPU', 'ShareGPT 8GPU', 'OpenMath 4GPU', 'OpenMath 8GPU'],
+                        datasets: [
+                            {
+                                label: 'B200 Perfect Router',
+                                data: [23277, 23696, 23248, 23702, 31206, 32565],
+                                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                                borderColor: '#10b981',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'B200 Default',
+                                data: [20859, 19355, 21768, 22051, 28500, 29757],
+                                backgroundColor: 'rgba(16, 185, 129, 0.4)',
+                                borderColor: '#10b981',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'H100 Perfect Router',
+                                data: [3087.990, 3303.395, 3088.507, 3309.627, 3249.846, 3280.332],
+                                backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                                borderColor: '#f59e0b',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'H100 Default',
+                                data: [1999.704, 1862.146, 2211.930, 2361.317, 2382.559, 2168.4551],
+                                backgroundColor: 'rgba(245, 158, 11, 0.4)',
+                                borderColor: '#f59e0b',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e2e8f0', font: { size: 14, weight: 'bold' } }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Throughput per GPU (tokens/s) - GPT-OSS-120B, B200 vs H100',
+                                color: '#e2e8f0',
+                                font: { size: 16, weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(71, 85, 105, 0.2)' },
+                                ticks: { color: '#e2e8f0', font: { size: 13, weight: 'bold' } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(71, 85, 105, 0.2)' },
+                                ticks: { color: '#e2e8f0', font: { weight: 'bold' } },
+                                title: { display: true, text: 'Tokens/s/GPU', color: '#e2e8f0', font: { weight: 'bold' } }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ============= Load Imbalance Gap Chart (B200 vs H100) =============
+            const loadImbalanceGapCtx = document.getElementById('load-imbalance-gap-chart');
+            if (loadImbalanceGapCtx) {
+                // Calculate gaps: (Perfect - Default) / Default * 100
+                const b200Gaps = [
+                    ((23277 - 20859) / 20859 * 100).toFixed(1),  // Random 4GPU: 11.6%
+                    ((23696 - 19355) / 19355 * 100).toFixed(1),  // Random 8GPU: 22.4%
+                    ((23248 - 21768) / 21768 * 100).toFixed(1),  // ShareGPT 4GPU: 6.8%
+                    ((23702 - 22051) / 22051 * 100).toFixed(1),  // ShareGPT 8GPU: 7.5%
+                    ((31206 - 28500) / 28500 * 100).toFixed(1),  // OpenMath 4GPU: 9.5%
+                    ((32565 - 29757) / 29757 * 100).toFixed(1)   // OpenMath 8GPU: 9.4%
+                ];
+                const h100Gaps = [
+                    ((3088 - 2000) / 2000 * 100).toFixed(1),     // Random 4GPU: 54.4%
+                    ((3303 - 1862) / 1862 * 100).toFixed(1),     // Random 8GPU: 77.4%
+                    ((3089 - 2212) / 2212 * 100).toFixed(1),     // ShareGPT 4GPU: 39.6%
+                    ((3310 - 2361) / 2361 * 100).toFixed(1),     // ShareGPT 8GPU: 40.2%
+                    ((3250 - 2383) / 2383 * 100).toFixed(1),     // OpenMath 4GPU: 36.4%
+                    ((3280 - 2168) / 2168 * 100).toFixed(1)      // OpenMath 8GPU: 51.3%
+                ];
+
+                new Chart(loadImbalanceGapCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Random 4GPU', 'Random 8GPU', 'ShareGPT 4GPU', 'ShareGPT 8GPU', 'OpenMath 4GPU', 'OpenMath 8GPU'],
+                        datasets: [
+                            {
+                                label: 'B200 Gap (%)',
+                                data: b200Gaps,
+                                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                                borderColor: '#10b981',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'H100 Gap (%)',
+                                data: h100Gaps,
+                                backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                                borderColor: '#f59e0b',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e2e8f0', font: { size: 14, weight: 'bold' } }
+                            },
+                            title: {
+                                display: true,
+                                text: 'MoE Load Imbalance Gap: (Perfect Router - Default) / Default',
+                                color: '#e2e8f0',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(71, 85, 105, 0.2)' },
+                                ticks: { color: '#e2e8f0', font: { size: 12, weight: 'bold' } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(71, 85, 105, 0.2)' },
+                                ticks: { color: '#e2e8f0', font: { weight: 'bold' } },
+                                title: { display: true, text: 'Performance Gap (%)', color: '#e2e8f0', font: { weight: 'bold' } }
+                            }
+                        }
+                    }
                 });
             }
 
