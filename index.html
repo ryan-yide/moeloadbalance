@@ -1093,12 +1093,15 @@ trtllm-bench \
                         <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
                             <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(Diminishing Returns)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                However, <strong>more GPUs does not always mean better performance</strong>. At some point, the memory wait time is already very small, so further slicing the model yields diminishing returns. Instead, <strong>two new effects start to dominate</strong>:
+                                As we scale TP and EP, the model is sliced into more shards, reducing per-GPU memory footprint and shortening per-step compute. However, <strong>the speedup does not continue indefinitely</strong>. Once compute becomes small, the system enters a latency/synchronization-dominated regime, where additional sharding introduces overheads that offset the memory/compute gains. Intuitively, increasing TP and EP amplifies <strong>two different effects</strong>:
                             </p>
                             <ul style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.8; margin: 0 0 15px 20px; padding: 0;">
-                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">MoE Load Imbalance:</strong> The learned router no longer keeps the load perfectly balanced—some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.</li>
-                                <li><strong style="color: #f59e0b;">Tensor Parallel Communication Overhead:</strong> As the number of GPUs increases, each decode step requires more AllReduce operations across more participants. The communication latency grows with the parallelism degree, and this overhead becomes non-negligible when compute time per step is already small.</li>
+                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">EP → MoE Load Imbalance:</strong> Larger EP tends to worsen end-to-end MoE imbalance. The learned router does not guarantee uniform token assignment; "hot" experts create <strong>straggler GPUs</strong>, while others stall at synchronization barriers. (EP also introduces dispatch/combine All-to-All overhead, but here we focus on imbalance as the dominant factor.)</li>
+                                <li><strong style="color: #f59e0b;">TP → Collective Communication Overhead:</strong> Larger TP increases the cost of tensor-parallel collectives (AllReduce / AllGather / ReduceScatter) over more participants, making communication latency non-negligible once compute per step is short.</li>
                             </ul>
+                            <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin: 0; font-style: italic;">
+                                In this blog, we primarily investigate the first effect: how EP-induced MoE load imbalance becomes the dominant bottleneck and degrades inference performance.
+                            </p>
                         </div>
                     </div>
 
@@ -1260,12 +1263,15 @@ trtllm-bench \
                         <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
                             <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(Diminishing Returns)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                However, <strong>more GPUs does not always mean better performance</strong>. At some point, the memory wait time is already very small, so further slicing the model yields diminishing returns. Instead, <strong>two new effects start to dominate</strong>:
+                                As we scale TP and EP, the model is sliced into more shards, reducing per-GPU memory footprint and shortening per-step compute. However, <strong>the speedup does not continue indefinitely</strong>. Once compute becomes small, the system enters a latency/synchronization-dominated regime, where additional sharding introduces overheads that offset the memory/compute gains. Intuitively, increasing TP and EP amplifies <strong>two different effects</strong>:
                             </p>
                             <ul style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.8; margin: 0 0 15px 20px; padding: 0;">
-                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">MoE Load Imbalance:</strong> The learned router no longer keeps the load perfectly balanced—some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.</li>
-                                <li><strong style="color: #f59e0b;">Tensor Parallel Communication Overhead:</strong> As the number of GPUs increases, each decode step requires more AllReduce operations across more participants. The communication latency grows with the parallelism degree, and this overhead becomes non-negligible when compute time per step is already small.</li>
+                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">EP → MoE Load Imbalance:</strong> Larger EP tends to worsen end-to-end MoE imbalance. The learned router does not guarantee uniform token assignment; "hot" experts create <strong>straggler GPUs</strong>, while others stall at synchronization barriers. (EP also introduces dispatch/combine All-to-All overhead, but here we focus on imbalance as the dominant factor.)</li>
+                                <li><strong style="color: #f59e0b;">TP → Collective Communication Overhead:</strong> Larger TP increases the cost of tensor-parallel collectives (AllReduce / AllGather / ReduceScatter) over more participants, making communication latency non-negligible once compute per step is short.</li>
                             </ul>
+                            <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin: 0; font-style: italic;">
+                                In this blog, we primarily investigate the first effect: how EP-induced MoE load imbalance becomes the dominant bottleneck and degrades inference performance.
+                            </p>
                         </div>
                     </div>
 
@@ -1491,12 +1497,15 @@ trtllm-bench \
                         <div class="regime-card" style="border: 1px solid rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, rgba(0,0,0,0) 100%);">
                             <h4 style="color: #ef4444; margin-bottom: 15px; font-size: 1.1rem;">Phase II: The Communication Wall<br><span style="font-size: 0.85rem; opacity: 0.8;">(Diminishing Returns)</span></h4>
                             <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px;">
-                                However, <strong>more GPUs does not always mean better performance</strong>. At some point, the memory wait time is already very small, so further slicing the model yields diminishing returns. Instead, <strong>two new effects start to dominate</strong>:
+                                As we scale TP and EP, the model is sliced into more shards, reducing per-GPU memory footprint and shortening per-step compute. However, <strong>the speedup does not continue indefinitely</strong>. Once compute becomes small, the system enters a latency/synchronization-dominated regime, where additional sharding introduces overheads that offset the memory/compute gains. Intuitively, increasing TP and EP amplifies <strong>two different effects</strong>:
                             </p>
                             <ul style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.8; margin: 0 0 15px 20px; padding: 0;">
-                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">MoE Load Imbalance:</strong> The learned router no longer keeps the load perfectly balanced—some experts become "hot" and receive many more tokens than others. The GPUs hosting those hot experts turn into <strong>stragglers</strong>, and everyone else has to wait for them at the synchronization barrier.</li>
-                                <li><strong style="color: #f59e0b;">Tensor Parallel Communication Overhead:</strong> As the number of GPUs increases, each decode step requires more AllReduce operations across more participants. The communication latency grows with the parallelism degree, and this overhead becomes non-negligible when compute time per step is already small.</li>
+                                <li style="margin-bottom: 10px;"><strong style="color: #f59e0b;">EP → MoE Load Imbalance:</strong> Larger EP tends to worsen end-to-end MoE imbalance. The learned router does not guarantee uniform token assignment; "hot" experts create <strong>straggler GPUs</strong>, while others stall at synchronization barriers. (EP also introduces dispatch/combine All-to-All overhead, but here we focus on imbalance as the dominant factor.)</li>
+                                <li><strong style="color: #f59e0b;">TP → Collective Communication Overhead:</strong> Larger TP increases the cost of tensor-parallel collectives (AllReduce / AllGather / ReduceScatter) over more participants, making communication latency non-negligible once compute per step is short.</li>
                             </ul>
+                            <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin: 0; font-style: italic;">
+                                In this blog, we primarily investigate the first effect: how EP-induced MoE load imbalance becomes the dominant bottleneck and degrades inference performance.
+                            </p>
                         </div>
                     </div>
 
